@@ -1,11 +1,11 @@
-package com.peterith.tickettrackingserver;
+package com.peterith.supportticketportalserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TicketTrackingServerApplication {
+public class SupportTicketPortalServerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TicketTrackingServerApplication.class, args);
+        SpringApplication.run(SupportTicketPortalServerApplication.class, args);
     }
 }

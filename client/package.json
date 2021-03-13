@@ -1,9 +1,10 @@
 {
-  "name": "ticket-tracking-client",
-  "version": "0.1.0",
+  "name": "support-ticket-portal-client",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "11.1.5",
+    "prop-types": "15.7.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-scripts": "4.0.3"
@@ -13,7 +14,7 @@
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.5",
     "@testing-library/user-event": "12.8.3",
-    "eslint": "7.21.0",
+    "eslint": "7.22.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-import": "2.22.1",
