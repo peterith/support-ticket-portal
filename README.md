@@ -1,6 +1,6 @@
-# Ticket Tracking System
+# Support Ticket Portal
 
-A customer support ticket system for SaaS companies.
+A customer support ticket portal for SaaS companies.
 
 ## Roadmap
 
