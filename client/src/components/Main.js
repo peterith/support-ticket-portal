@@ -1,42 +1,18 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import TicketTable from "./ticketTable";
 import TicketDisplay from "./TicketDisplay";
 
-const Main = ({ className }) => {
+const Main = ({ tickets, className }) => {
   const { id } = useParams();
   const history = useHistory();
-  const [tickets, setTickets] = useState([]);
-  const [networkError, setNetworkError] = useState(false);
 
   const selectedTicket = useMemo(() => {
     return tickets.find((ticket) => ticket.id === Number(id));
   }, [tickets, id]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/tickets`
-        );
-        const data = await response.json();
-        setTickets(data);
-      } catch (error) {
-        setNetworkError(true);
-      }
-    })();
-  }, []);
-
-  const handleClickRow = (ticket) => {
-    history.push(`/tickets/${ticket.id}`);
-  };
-
-  const handleClickClose = () => {
-    history.push(`/tickets`);
-  };
 
   const mainStyle = css`
     display: flex;
@@ -50,23 +26,18 @@ const Main = ({ className }) => {
     flex: 0 0 400px;
   `;
 
-  const errorStyle = css`
-    text-align: center;
-    font-size: 1.2rem;
-  `;
-
   const tableInfoStyle = css`
     text-align: center;
     font-size: 1.1rem;
   `;
 
-  if (networkError) {
-    return (
-      <p role="alert" css={errorStyle}>
-        Network error, please try again later :(
-      </p>
-    );
-  }
+  const handleClickRow = (ticket) => {
+    history.push(`/tickets/${ticket.id}`);
+  };
+
+  const handleClickClose = () => {
+    history.push(`/tickets`);
+  };
 
   return (
     <main css={mainStyle} className={className}>
@@ -93,6 +64,20 @@ const Main = ({ className }) => {
 };
 
 Main.propTypes = {
+  tickets: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      status: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+      priority: PropTypes.string.isRequired,
+      author: PropTypes.string.isRequired,
+      agent: PropTypes.string,
+      createdAt: PropTypes.string.isRequired,
+      updatedAt: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   className: PropTypes.string,
 };
 

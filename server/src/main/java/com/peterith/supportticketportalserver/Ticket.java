@@ -1,5 +1,6 @@
 package com.peterith.supportticketportalserver;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +10,14 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Ticket {
 
     @Id
@@ -31,7 +34,7 @@ public class Ticket {
     @NotNull
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.OPEN;
 
     @NotNull
     @Column(length = 20)
@@ -41,7 +44,7 @@ public class Ticket {
     @NotNull
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
-    private Priority priority;
+    private Priority priority = Priority.MEDIUM;
 
     @NotNull
     @Column(length = 100)
@@ -51,8 +54,8 @@ public class Ticket {
     private String agent;
 
     @NotNull
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
 
     @NotNull
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
 }

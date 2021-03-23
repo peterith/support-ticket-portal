@@ -1,7 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
+import PropTypes from "prop-types";
+import useModal from "../hooks/useModal";
 
-const Header = () => {
+const Header = ({ onCreateTicket }) => {
+  const { openModal } = useModal();
+
   const headerStyle = css`
     display: flex;
     align-items: center;
@@ -12,7 +16,7 @@ const Header = () => {
   `;
 
   const buttonStyle = css`
-    background-color: #1a8cff;
+    background-color: #09f;
     border-radius: 10px;
     padding: 12px;
     margin: 0px 10px 0px auto;
@@ -23,18 +27,26 @@ const Header = () => {
     font-size: 1.1rem;
     &:hover {
       cursor: pointer;
-      background-color: #0073e6;
+      background-color: #08f;
     }
   `;
 
   return (
     <header css={headerStyle}>
       <h1>Support Ticket Portal</h1>
-      <button type="button" css={buttonStyle}>
+      <button
+        type="button"
+        onClick={openModal({ onSubmit: onCreateTicket })}
+        css={buttonStyle}
+      >
         Create
       </button>
     </header>
   );
+};
+
+Header.propTypes = {
+  onCreateTicket: PropTypes.func.isRequired,
 };
 
 export default Header;

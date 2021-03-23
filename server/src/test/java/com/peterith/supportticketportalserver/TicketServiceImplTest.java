@@ -1,97 +1,97 @@
 package com.peterith.supportticketportalserver;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class TicketServiceImplTest {
 
-    @MockBean
+    @Autowired
     TicketRepository ticketRepository;
 
     @Autowired
     TicketService ticketService;
 
+    Ticket ticket1 = Ticket.builder()
+            .title("Ticket 1")
+            .description("Description 1")
+            .status(Status.OPEN)
+            .category(Category.BUG)
+            .priority(Priority.MEDIUM)
+            .author("John Doe")
+            .agent("Joe Bloggs")
+            .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+            .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+            .build();
+
+    Ticket ticket2 = Ticket.builder()
+            .title("Ticket 2")
+            .description("Description 2")
+            .status(Status.IN_PROGRESS)
+            .category(Category.FEATURE_REQUEST)
+            .priority(Priority.HIGH)
+            .author("Jane Doe")
+            .agent("Joe Schmoe")
+            .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+            .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+            .build();
+
+    @BeforeEach
+    void setUp() {
+        ticketRepository.saveAll(List.of(ticket1, ticket2));
+    }
+
+    @AfterEach
+    void tearDown() {
+        ticketRepository.deleteAll();
+    }
+
     @Test
-    void GivenTicketsExist_WhenFindAll_ThenReturnTickets() {
-        Ticket ticket1 = Ticket.builder()
-                .id(1L)
-                .title("Ticket 1")
-                .description("Description 1")
-                .status(Status.OPEN)
-                .category(Category.BUG)
-                .priority(Priority.MEDIUM)
-                .author("John Doe")
-                .agent("Joe Bloggs")
-                .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
-                .build();
-
-        Ticket ticket2 = Ticket.builder()
-                .id(2L)
-                .title("Ticket 2")
-                .description("Description 2")
-                .status(Status.IN_PROGRESS)
-                .category(Category.FEATURE_REQUEST)
-                .priority(Priority.LOW)
-                .author("Jane Doe")
-                .agent("Joe Schmoe")
-                .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
-                .build();
-
+    void shouldReturnTicketsWhenFindAll() {
         List<Ticket> expected = List.of(ticket1, ticket2);
-        when(ticketRepository.findAll()).thenReturn(expected);
         List<Ticket> actual = ticketService.findAll();
+        System.out.println(actual);
         assertThat(actual, is(expected));
     }
 
     @Test
-    void GivenNoTickets_WhenFindAll_ThenReturnEmpty() {
-        when(ticketRepository.findAll()).thenReturn(new ArrayList<>());
-        List<Ticket> actual = ticketService.findAll();
-        assertThat(actual, is(empty()));
+    void shouldReturnTicketWhenFindById() {
+        Optional<Ticket> expected = Optional.of(ticket1);
+        Optional<Ticket> actual = ticketService.findById(ticket1.getId());
+        assertThat(actual, is(expected));
     }
 
     @Test
-    void GivenTicketExists_WhenFindById_ThenReturnTicket() {
-        Ticket ticket = Ticket.builder()
-                .id(1L)
-                .title("Ticket 1")
-                .description("Description")
+    void shouldReturnEmptyWhenFindByIdAndNoTicket() {
+        Optional<Ticket> actual = ticketService.findById(0L);
+        assertThat(actual, is(Optional.empty()));
+    }
+
+    @Test
+    void shouldReturnTicketWhenCreate() {
+        Ticket expected = Ticket.builder()
+                .title("Ticket 3")
+                .description("Description 3")
                 .status(Status.OPEN)
-                .category(Category.BUG)
+                .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.MEDIUM)
                 .author("John Doe")
-                .agent("Joe Bloggs")
                 .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
                 .build();
 
-        Optional<Ticket> expected = Optional.of(ticket);
-        when(ticketRepository.findById(eq(1L))).thenReturn(expected);
-        Optional<Ticket> actual = ticketService.findById(1L);
+        Ticket actual = ticketService.create(expected);
         assertThat(actual, is(expected));
-    }
-
-    @Test
-    void GivenNoTicket_WhenFindById_ThenReturnEmpty() {
-        when(ticketRepository.findById(eq(1L))).thenReturn(Optional.empty());
-        Optional<Ticket> actual = ticketService.findById(1L);
-        assertThat(actual, is(Optional.empty()));
     }
 }

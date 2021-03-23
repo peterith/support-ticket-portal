@@ -37,16 +37,13 @@ TicketTable.propTypes = {
       createdAt: PropTypes.string.isRequired,
       updatedAt: PropTypes.string.isRequired,
     })
-  ),
-  selectedRow: PropTypes.number,
-  onClickRow: PropTypes.func,
+  ).isRequired,
+  selectedRow: PropTypes.number.isRequired,
+  onClickRow: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 
 TicketTable.defaultProps = {
-  tickets: [],
-  selectedRow: null,
-  onClickRow: null,
   className: "",
 };
 

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TicketServiceImpl implements TicketService<Ticket> {
+public class TicketServiceImpl implements TicketService {
 
     @Autowired
     TicketRepository ticketRepository;
@@ -20,5 +20,10 @@ public class TicketServiceImpl implements TicketService<Ticket> {
     @Override
     public Optional<Ticket> findById(Long id) {
         return ticketRepository.findById(id);
+    }
+
+    @Override
+    public Ticket create(Ticket ticket) {
+        return ticketRepository.save(ticket);
     }
 }
