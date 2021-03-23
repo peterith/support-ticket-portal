@@ -57,19 +57,19 @@ const TicketDisplay = ({ ticket, onClose, className }) => {
 
   return (
     <article
-      aria-labelledby="ticket-heading"
+      aria-labelledby="ticket-title"
       css={displayStyle}
       className={className}
     >
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close ticket display"
+        aria-label="close"
         css={buttonStyle}
       >
         <FontAwesomeIcon icon={faTimes} />
       </button>
-      <h2 id="ticket-heading" css={h2Style}>
+      <h2 id="ticket-title" css={h2Style}>
         {ticket.title}
       </h2>
       <h3 id="ticket-description" css={h3Style}>
@@ -133,12 +133,11 @@ TicketDisplay.propTypes = {
     createdAt: PropTypes.string.isRequired,
     updatedAt: PropTypes.string.isRequired,
   }).isRequired,
-  onClose: PropTypes.func,
+  onClose: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 
 TicketDisplay.defaultProps = {
-  onClose: null,
   className: "",
 };
 

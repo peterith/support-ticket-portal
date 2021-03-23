@@ -23,7 +23,7 @@ public class SupportTicketPortalServerApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/tickets")
-                        .allowedMethods("GET")
+                        .allowedMethods("GET", "POST")
                         .allowedOrigins(corsOrigin);
             }
         };

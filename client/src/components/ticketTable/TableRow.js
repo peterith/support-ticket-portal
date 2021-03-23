@@ -7,13 +7,13 @@ import PriorityDisplay from "../PriorityDisplay";
 
 const TableRow = ({ ticket, onClick, selected }) => {
   const trStyle = css`
-    transition: background-color 0.5s;
+    transition: background-color 0.5s, box-shadow 0.3s;
     border-bottom: 2px solid #e0e0e0;
-    background-color: ${selected && "#e0e0e0"};
+    box-shadow: ${selected && "0px 5px 20px rgba(0, 0, 0, 0.3)"};
     outline: none;
     &:hover {
       cursor: pointer;
-      background-color: #e0e0e0;
+      background-color: ${!selected && "#e0e0e0"};
     }
   `;
 
@@ -55,12 +55,11 @@ TableRow.propTypes = {
     createdAt: PropTypes.string.isRequired,
     updatedAt: PropTypes.string.isRequired,
   }).isRequired,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func.isRequired,
   selected: PropTypes.bool,
 };
 
 TableRow.defaultProps = {
-  onClick: null,
   selected: false,
 };
 

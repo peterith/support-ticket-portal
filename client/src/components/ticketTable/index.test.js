@@ -1,5 +1,3 @@
-// __tests__/fetch.test.js
-import React from "react";
 import { render, fireEvent, screen } from "@testing-library/react";
 import TicketTable from ".";
 import { CategoryEnum, PriorityEnum, StatusEnum } from "../../enums";
@@ -34,6 +32,8 @@ describe("Ticket Table", () => {
             updatedAt: "2020-01-04T00:00:00",
           },
         ]}
+        selectedRow={0}
+        onClickRow={jest.fn()}
       />
     );
 
@@ -77,7 +77,13 @@ describe("Ticket Table", () => {
       updatedAt: "2020-01-04T00:00:00",
     };
 
-    render(<TicketTable tickets={[ticket1, ticket2]} onClickRow={mockFn} />);
+    render(
+      <TicketTable
+        tickets={[ticket1, ticket2]}
+        selectedRow={0}
+        onClickRow={mockFn}
+      />
+    );
     fireEvent.click(screen.getByText("Ticket 1"));
 
     expect(mockFn).toHaveBeenCalledTimes(1);

@@ -30,15 +30,9 @@ TableBody.propTypes = {
       createdAt: PropTypes.string.isRequired,
       updatedAt: PropTypes.string.isRequired,
     })
-  ),
-  selectedRow: PropTypes.number,
-  onClickRow: PropTypes.func,
-};
-
-TableBody.defaultProps = {
-  tickets: [],
-  selectedRow: null,
-  onClickRow: null,
+  ).isRequired,
+  selectedRow: PropTypes.number.isRequired,
+  onClickRow: PropTypes.func.isRequired,
 };
 
 export default TableBody;
