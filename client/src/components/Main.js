@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import TicketTable from "./ticketTable";
 import TicketDisplay from "./TicketDisplay";
 
-const Main = ({ tickets, className }) => {
+const Main = ({ tickets, onDeleteTicket, className }) => {
   const { id } = useParams();
   const history = useHistory();
 
@@ -56,6 +56,7 @@ const Main = ({ tickets, className }) => {
         <TicketDisplay
           ticket={selectedTicket}
           onClose={handleClickClose}
+          onDelete={onDeleteTicket}
           css={displayStyle}
         />
       )}
@@ -78,6 +79,7 @@ Main.propTypes = {
       updatedAt: PropTypes.string.isRequired,
     })
   ).isRequired,
+  onDeleteTicket: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 

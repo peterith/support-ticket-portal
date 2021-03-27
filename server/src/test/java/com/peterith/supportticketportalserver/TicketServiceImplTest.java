@@ -94,4 +94,12 @@ class TicketServiceImplTest {
         Ticket actual = ticketService.create(expected);
         assertThat(actual, is(expected));
     }
+
+    @Test
+    void shouldDeleteById() {
+        ticketService.deleteById(ticket2.getId());
+        List<Ticket> expected = List.of(ticket1);
+        List<Ticket> actual = ticketRepository.findAll();
+        assertThat(actual, is(expected));
+    }
 }

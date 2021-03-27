@@ -5,29 +5,43 @@ import { StatusEnum } from "../../enums";
 describe("Status Pill", () => {
   it("should display open pill", () => {
     render(<StatusPill status={StatusEnum.OPEN} />);
-    expect(screen.getByText("Open")).toBeInTheDocument();
+
+    const openPill = screen.getByText("Open");
+    expect(openPill).toBeInTheDocument();
   });
 
   it("should display in progress pill", async () => {
     render(<StatusPill status={StatusEnum.IN_PROGRESS} />);
-    expect(screen.getByText("In Progress")).toBeInTheDocument();
+
+    const inProgressPill = screen.getByText("In Progress");
+    expect(inProgressPill).toBeInTheDocument();
   });
 
   it("should display resolved pill", async () => {
     render(<StatusPill status={StatusEnum.RESOLVED} />);
-    expect(screen.getByText("Resolved")).toBeInTheDocument();
+
+    const resolvedPill = screen.getByText("Resolved");
+    expect(resolvedPill).toBeInTheDocument();
   });
 
   it("should display closed pill", async () => {
     render(<StatusPill status={StatusEnum.CLOSED} />);
-    expect(screen.getByText("Closed")).toBeInTheDocument();
+
+    const closedPill = screen.getByText("Closed");
+    expect(closedPill).toBeInTheDocument();
   });
 
   it("should not display pill when unknown status", async () => {
-    render(<StatusPill status={""} />);
-    expect(screen.queryByText("Open")).not.toBeInTheDocument();
-    expect(screen.queryByText("In Progress")).not.toBeInTheDocument();
-    expect(screen.queryByText("Resolved")).not.toBeInTheDocument();
-    expect(screen.queryByText("Closed")).not.toBeInTheDocument();
+    render(<StatusPill status="" />);
+
+    const openPill = screen.queryByText("Open");
+    const inProgressPill = screen.queryByText("In Progress");
+    const resolvedPill = screen.queryByText("Resolved");
+    const closedPill = screen.queryByText("Closed");
+
+    expect(openPill).not.toBeInTheDocument();
+    expect(inProgressPill).not.toBeInTheDocument();
+    expect(resolvedPill).not.toBeInTheDocument();
+    expect(closedPill).not.toBeInTheDocument();
   });
 });

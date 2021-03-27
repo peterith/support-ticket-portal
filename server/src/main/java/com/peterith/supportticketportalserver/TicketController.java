@@ -32,4 +32,9 @@ public class TicketController extends Controller<Ticket> {
         return ResponseEntity.status(HttpStatus.OK).body(createdTicket);
     }
 
+    @DeleteMapping("/tickets/{id}")
+    public ResponseEntity deleteById(@PathVariable Long id) {
+        ticketService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

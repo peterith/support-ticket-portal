@@ -17,7 +17,6 @@ const Modal = ({ heading, children, onClose }) => {
   `;
 
   const modalStyle = css`
-    width: 400px;
     margin: 0px auto;
     padding: 30px;
     border-radius: 10px;
@@ -44,7 +43,7 @@ const Modal = ({ heading, children, onClose }) => {
 
   return (
     <div css={backgroundStyle}>
-      <div css={modalStyle} aria-labelledby="modal-title">
+      <div role="dialog" aria-labelledby="modal-title" css={modalStyle}>
         <button
           type="button"
           onClick={onClose}

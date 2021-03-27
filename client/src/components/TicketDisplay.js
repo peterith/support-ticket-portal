@@ -1,13 +1,23 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 import StatusPill from "./statusPill";
 import CategoryPill from "./categoryPill";
 import PriorityDisplay from "./PriorityDisplay";
+import useModal from "../hooks/useModal";
+import { ModalTypeEnum } from "../enums";
 
-const TicketDisplay = ({ ticket, onClose, className }) => {
+const TicketDisplay = ({ ticket, onClose, onDelete, className }) => {
+  const [errorMessage, setErrorMessage] = useState(null);
+  const { openModal } = useModal();
+
+  useEffect(() => {
+    setErrorMessage(null);
+  }, [ticket]);
+
   const displayStyle = css`
     background-color: #222b41;
     color: #fff;
@@ -15,7 +25,6 @@ const TicketDisplay = ({ ticket, onClose, className }) => {
   `;
 
   const buttonStyle = css`
-    float: right;
     color: #fff;
     background-color: transparent;
     border: none;
@@ -23,6 +32,10 @@ const TicketDisplay = ({ ticket, onClose, className }) => {
     &:hover {
       cursor: pointer;
     }
+  `;
+
+  const closeButtonStyle = css`
+    float: right;
   `;
 
   const h2Style = css`
@@ -55,17 +68,34 @@ const TicketDisplay = ({ ticket, onClose, className }) => {
     justify-content: left;
   `;
 
+  const errorStyle = css`
+    background-color: #86e;
+    border-radius: 5px;
+    text-align: center;
+    padding: 10px;
+    margin-top: 15px;
+    color: #fff;
+  `;
+
+  const onConfirm = async () => {
+    try {
+      onDelete(ticket);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
   return (
     <article
       aria-labelledby="ticket-title"
-      css={displayStyle}
+      css={[displayStyle]}
       className={className}
     >
       <button
         type="button"
         onClick={onClose}
         aria-label="close"
-        css={buttonStyle}
+        css={[buttonStyle, closeButtonStyle]}
       >
         <FontAwesomeIcon icon={faTimes} />
       </button>
@@ -107,15 +137,19 @@ const TicketDisplay = ({ ticket, onClose, className }) => {
           {new Date(ticket.updatedAt).toLocaleString()}
         </span>
       </div>
-
       <button
         type="button"
-        onClick={onClose}
-        aria-label="delete ticket"
+        onClick={openModal(ModalTypeEnum.DELETE_CONFIRMATION, { onConfirm })}
+        aria-label="delete"
         css={buttonStyle}
       >
         <FontAwesomeIcon icon={faTrashAlt} />
       </button>
+      {errorMessage && (
+        <div role="alert" css={errorStyle}>
+          {errorMessage}
+        </div>
+      )}
     </article>
   );
 };
@@ -134,6 +168,7 @@ TicketDisplay.propTypes = {
     updatedAt: PropTypes.string.isRequired,
   }).isRequired,
   onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 

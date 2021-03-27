@@ -1,15 +1,17 @@
 import { MemoryRouter, Route } from "react-router-dom";
-import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-  within,
-} from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import Main from "./Main";
+import { ModalProvider } from "../context/ModalContext";
 import { StatusEnum, CategoryEnum, PriorityEnum } from "../enums";
 
 describe("Main", () => {
+  const appRoot = document.createElement("div");
+  appRoot.id = "app-root";
+  const modalRoot = document.createElement("div");
+  modalRoot.id = "modal-root";
+  const container = document.createElement("div");
+  container.append(appRoot, modalRoot);
+
   const tickets = [
     {
       id: 1,
@@ -40,15 +42,13 @@ describe("Main", () => {
   it("should display ticket table and total tickets", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
-        <Route exact path={["/tickets", "/tickets/:id"]}>
-          <Main tickets={tickets} />
-        </Route>
+        <ModalProvider>
+          <Route exact path={["/tickets", "/tickets/:id"]}>
+            <Main tickets={tickets} onDeleteTicket={jest.fn()} />
+          </Route>
+        </ModalProvider>
       </MemoryRouter>
     );
-
-    await waitFor(() => {
-      expect(screen.getAllByRole("row")).toHaveLength(3);
-    });
 
     const table = screen.getByRole("table");
     const [head, body] = within(table).getAllByRole("rowgroup");
@@ -83,29 +83,26 @@ describe("Main", () => {
     });
     expect(ticket2[4]).toContainElement(highPriority);
 
-    expect(screen.getByLabelText("Total tickets:")).toHaveTextContent("2");
+    const totalTickets = screen.getByLabelText("Total tickets:");
+    expect(totalTickets).toHaveTextContent("2");
   });
 
   it("should render ticket display when click on table row", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
-        <Route exact path={["/tickets", "/tickets/:id"]}>
-          <Main tickets={tickets} />
-        </Route>
+        <ModalProvider>
+          <Route exact path={["/tickets", "/tickets/:id"]}>
+            <Main tickets={tickets} onDeleteTicket={jest.fn()} />
+          </Route>
+        </ModalProvider>
       </MemoryRouter>
     );
 
-    const row = await waitFor(() => {
-      const table = screen.getByRole("table");
-      const rows = within(table).getAllByRole("row");
-      expect(rows).toHaveLength(3);
-      return rows[1];
-    });
-    fireEvent.click(row);
+    const table = screen.getByRole("table");
+    const rows = within(table).getAllByRole("row");
+    fireEvent.click(rows[1]);
 
-    const article = await waitFor(() => {
-      return screen.getByRole("article", { name: "Ticket 1" });
-    });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
 
     const heading = within(article).getByRole("heading", { name: "Ticket 1" });
     expect(heading).toBeInTheDocument();
@@ -144,41 +141,15 @@ describe("Main", () => {
   it("should render ticket display when URL path is /tickets/:id", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <Route exact path={["/tickets", "/tickets/:id"]}>
-          <Main
-            tickets={[
-              {
-                id: 1,
-                title: "Ticket 1",
-                description: "Description 1",
-                status: StatusEnum.OPEN,
-                category: CategoryEnum.BUG,
-                priority: PriorityEnum.MEDIUM,
-                author: "John Doe",
-                agent: "Joe Bloggs",
-                createdAt: "2020-01-01T00:00:00",
-                updatedAt: "2020-01-02T00:00:00",
-              },
-              {
-                id: 2,
-                title: "Ticket 2",
-                description: "Description 2",
-                status: StatusEnum.IN_PROGRESS,
-                category: CategoryEnum.FEATURE_REQUEST,
-                priority: PriorityEnum.HIGH,
-                author: "Jane Doe",
-                agent: "Joe Schmoe",
-                createdAt: "2020-01-03T00:00:00",
-                updatedAt: "2020-01-04T00:00:00",
-              },
-            ]}
-          />
-        </Route>
+        <ModalProvider>
+          <Route exact path={["/tickets", "/tickets/:id"]}>
+            <Main tickets={tickets} onDeleteTicket={jest.fn()} />
+          </Route>
+        </ModalProvider>
       </MemoryRouter>
     );
-    const article = await waitFor(() => {
-      return screen.getByRole("article", { name: "Ticket 1" });
-    });
+
+    const article = screen.getByRole("article", { name: "Ticket 1" });
 
     const heading = within(article).getByRole("heading", { name: "Ticket 1" });
     expect(heading).toBeInTheDocument();
@@ -217,47 +188,46 @@ describe("Main", () => {
   it("should close ticket display when click on close button", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <Route exact path={["/tickets", "/tickets/:id"]}>
-          <Main
-            tickets={[
-              {
-                id: 1,
-                title: "Ticket 1",
-                description: "Description 1",
-                status: StatusEnum.OPEN,
-                category: CategoryEnum.BUG,
-                priority: PriorityEnum.MEDIUM,
-                author: "John Doe",
-                agent: "Joe Bloggs",
-                createdAt: "2020-01-01T00:00:00",
-                updatedAt: "2020-01-02T00:00:00",
-              },
-              {
-                id: 2,
-                title: "Ticket 2",
-                description: "Description 2",
-                status: StatusEnum.IN_PROGRESS,
-                category: CategoryEnum.FEATURE_REQUEST,
-                priority: PriorityEnum.HIGH,
-                author: "Jane Doe",
-                agent: "Joe Schmoe",
-                createdAt: "2020-01-03T00:00:00",
-                updatedAt: "2020-01-04T00:00:00",
-              },
-            ]}
-          />
-        </Route>
+        <ModalProvider>
+          <Route exact path={["/tickets", "/tickets/:id"]}>
+            <Main tickets={tickets} onDeleteTicket={jest.fn()} />
+          </Route>
+        </ModalProvider>
       </MemoryRouter>
     );
-    const article = await waitFor(() => {
-      return screen.getByRole("article", { name: "Ticket 1" });
-    });
 
-    const closeButton = screen.getByRole("button", { name: "close" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const closeButton = within(article).getByRole("button", { name: "close" });
     fireEvent.click(closeButton);
 
-    await waitFor(() => {
-      expect(article).not.toBeInTheDocument();
+    expect(article).not.toBeInTheDocument();
+  });
+
+  it("should call onDelete when click on delete button", async () => {
+    const mockFn = jest.fn();
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <ModalProvider>
+          <Route exact path={["/tickets", "/tickets/:id"]}>
+            <Main tickets={tickets} onDeleteTicket={mockFn} />
+          </Route>
+        </ModalProvider>
+      </MemoryRouter>,
+      { container: document.body.appendChild(container).firstChild }
+    );
+
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const deleteButton = within(article).getByRole("button", {
+      name: "delete",
     });
+    fireEvent.click(deleteButton);
+
+    const modal = screen.getByRole("dialog", { name: "Delete ticket" });
+    const confirmButton = within(modal).getByRole("button", {
+      name: "Confirm",
+    });
+    fireEvent.click(confirmButton);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
   });
 });

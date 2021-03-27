@@ -9,4 +9,6 @@ public interface TicketService {
     Optional<Ticket> findById(Long id);
 
     Ticket create(Ticket ticket);
+
+    void deleteById(Long id);
 }

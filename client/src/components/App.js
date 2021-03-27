@@ -19,6 +19,7 @@ const App = () => {
           `${process.env.REACT_APP_SERVER_URL}/tickets`
         );
         const data = await response.json();
+
         setTickets(data);
       } catch (error) {
         setNetworkError(true);
@@ -42,11 +43,34 @@ const App = () => {
   `;
 
   const handleCreateTicket = async (ticket) => {
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_URL}/tickets`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ticket),
+      }
+    );
+    const data = await response.json();
+
     setTickets((previousTickets) => {
-      return [...previousTickets, ticket];
+      return [...previousTickets, data];
     });
     closeModal();
-    history.push(`/tickets/${ticket.id}`);
+    history.push(`/tickets/${data.id}`);
+  };
+
+  const handleDeleteTicket = async (ticket) => {
+    await fetch(`${process.env.REACT_APP_SERVER_URL}/tickets/${ticket.id}`, {
+      method: "DELETE",
+    });
+    setTickets((previousTickets) => {
+      return previousTickets.filter((previousTicket) => {
+        return previousTicket.id !== ticket.id;
+      });
+    });
+    closeModal();
+    history.push(`/tickets`);
   };
 
   if (networkError) {
@@ -62,7 +86,11 @@ const App = () => {
       <Header onCreateTicket={handleCreateTicket} />
       <Switch>
         <Route exact path={["/tickets", "/tickets/:id"]}>
-          <Main tickets={tickets} css={mainStyle} />
+          <Main
+            tickets={tickets}
+            onDeleteTicket={handleDeleteTicket}
+            css={mainStyle}
+          />
         </Route>
         <Route path="*">
           <Redirect to="/tickets" />

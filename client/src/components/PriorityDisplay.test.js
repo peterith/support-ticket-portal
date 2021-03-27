@@ -5,21 +5,29 @@ import { PriorityEnum } from "../enums";
 describe("Priority Display", () => {
   it("should display low priority", () => {
     render(<PriorityDisplay priority={PriorityEnum.LOW} />);
-    expect(screen.getByRole("img", "low priority")).toBeInTheDocument();
+
+    const lowPriority = screen.getByRole("img", { name: "low priority" });
+    expect(lowPriority).toBeInTheDocument();
   });
 
   it("should display medium priority", async () => {
     render(<PriorityDisplay priority={PriorityEnum.MEDIUM} />);
-    expect(screen.getByRole("img", "medium priority")).toBeInTheDocument();
+
+    const mediumPriority = screen.getByRole("img", { name: "medium priority" });
+    expect(mediumPriority).toBeInTheDocument();
   });
 
   it("should display high priority", async () => {
     render(<PriorityDisplay priority={PriorityEnum.HIGH} />);
-    expect(screen.getByRole("img", "high priority")).toBeInTheDocument();
+
+    const highPriority = screen.getByRole("img", { name: "high priority" });
+    expect(highPriority).toBeInTheDocument();
   });
 
   it("should not display priority when unknown priority", async () => {
     render(<PriorityDisplay priority="" />);
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+
+    const priority = screen.queryByRole("img", { name: /priority/i });
+    expect(priority).not.toBeInTheDocument();
   });
 });

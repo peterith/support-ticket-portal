@@ -14,8 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.peterith.supportticketportalserver.TestUtils.toJSONString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -104,5 +103,10 @@ class TicketControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expected, false));
+    }
+
+    @Test
+    void shouldReturnOkWhenDeleteTicketById() throws Exception {
+        mockMvc.perform(delete("/tickets/" + ticket1.getId())).andExpect(status().isOk());
     }
 }
