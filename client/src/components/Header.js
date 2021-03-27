@@ -2,6 +2,7 @@
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 import useModal from "../hooks/useModal";
+import { ModalTypeEnum } from "../enums";
 
 const Header = ({ onCreateTicket }) => {
   const { openModal } = useModal();
@@ -36,7 +37,9 @@ const Header = ({ onCreateTicket }) => {
       <h1>Support Ticket Portal</h1>
       <button
         type="button"
-        onClick={openModal({ onSubmit: onCreateTicket })}
+        onClick={openModal(ModalTypeEnum.CREATE_TICKET_FORM, {
+          onSubmit: onCreateTicket,
+        })}
         css={buttonStyle}
       >
         Create

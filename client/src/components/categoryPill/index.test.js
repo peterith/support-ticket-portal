@@ -5,29 +5,43 @@ import { CategoryEnum } from "../../enums";
 describe("Category Pill", () => {
   it("should display bug pill", () => {
     render(<CategoryPill category={CategoryEnum.BUG} />);
-    expect(screen.getByText("BUG")).toBeInTheDocument();
+
+    const bugPill = screen.getByText("BUG");
+    expect(bugPill).toBeInTheDocument();
   });
 
   it("should display feature request pill", async () => {
     render(<CategoryPill category={CategoryEnum.FEATURE_REQUEST} />);
-    expect(screen.getByText("FEATURE REQUEST")).toBeInTheDocument();
+
+    const featureRequestPill = screen.getByText("FEATURE REQUEST");
+    expect(featureRequestPill).toBeInTheDocument();
   });
 
   it("should display technical issue pill", async () => {
     render(<CategoryPill category={CategoryEnum.TECHNICAL_ISSUE} />);
-    expect(screen.getByText("TECHNICAL ISSUE")).toBeInTheDocument();
+
+    const technicalIssuePill = screen.getByText("TECHNICAL ISSUE");
+    expect(technicalIssuePill).toBeInTheDocument();
   });
 
   it("should display account pill", async () => {
     render(<CategoryPill category={CategoryEnum.ACCOUNT} />);
-    expect(screen.getByText("ACCOUNT")).toBeInTheDocument();
+
+    const accountPill = screen.getByText("ACCOUNT");
+    expect(accountPill).toBeInTheDocument();
   });
 
   it("should not display pill when unknown category", async () => {
-    render(<CategoryPill category={""} />);
-    expect(screen.queryByText("BUG")).not.toBeInTheDocument();
-    expect(screen.queryByText("FEATURE REQUEST")).not.toBeInTheDocument();
-    expect(screen.queryByText("TECHNICAL ISSUE")).not.toBeInTheDocument();
-    expect(screen.queryByText("ACCOUNT")).not.toBeInTheDocument();
+    render(<CategoryPill category="" />);
+
+    const bugPill = screen.queryByText("BUG");
+    const featureRequestPill = screen.queryByText("FEATURE REQUEST");
+    const technicalIssuePill = screen.queryByText("TECHNICAL ISSUE");
+    const accountPill = screen.queryByText("ACCOUNT");
+
+    expect(bugPill).not.toBeInTheDocument();
+    expect(featureRequestPill).not.toBeInTheDocument();
+    expect(technicalIssuePill).not.toBeInTheDocument();
+    expect(accountPill).not.toBeInTheDocument();
   });
 });

@@ -13,6 +13,10 @@ const CreateTicketForm = ({ onSubmit }) => {
   });
   const [errorMessage, setErrorMessage] = useState("");
 
+  const formStyle = css`
+    width: 400px;
+  `;
+
   const labelStyle = css`
     font-size: 1.1rem;
   `;
@@ -42,6 +46,7 @@ const CreateTicketForm = ({ onSubmit }) => {
   `;
 
   const buttonStyle = css`
+    float: right;
     background-color: #09f;
     border-radius: 5px;
     padding: 10px;
@@ -93,25 +98,14 @@ const CreateTicketForm = ({ onSubmit }) => {
     try {
       event.preventDefault();
       validateForm();
-
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/tickets`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formValues),
-        }
-      );
-      const data = await response.json();
-
-      onSubmit(data);
+      onSubmit(formValues);
     } catch (error) {
       setErrorMessage(error.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} css={formStyle}>
       <label htmlFor="form-ticket-title" css={labelStyle}>
         Title
         <br />

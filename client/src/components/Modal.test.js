@@ -11,7 +11,9 @@ describe("Modal", () => {
 
     const heading = screen.getByRole("heading");
     expect(heading).toHaveTextContent("Create ticket");
-    expect(screen.getByTestId("test")).toBeInTheDocument();
+
+    const content = screen.getByTestId("test");
+    expect(content).toBeInTheDocument();
   });
 
   it("should call onClose when click on close button", async () => {

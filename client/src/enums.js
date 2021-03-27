@@ -17,3 +17,8 @@ export const PriorityEnum = {
   MEDIUM: "MEDIUM",
   HIGH: "HIGH",
 };
+
+export const ModalTypeEnum = {
+  CREATE_TICKET_FORM: "CREATE_TICKET_FORM",
+  DELETE_CONFIRMATION: "DELETE_CONFIRMATION",
+};
