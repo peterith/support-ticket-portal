@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import Header from "./Header";
 import { ModalProvider } from "../context/ModalContext";
+import { CategoryEnum } from "../enums";
 
 describe("Header", () => {
   const appRoot = document.createElement("div");
@@ -56,5 +57,11 @@ describe("Header", () => {
     fireEvent.click(submitButton);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith({
+      title: "Title 1",
+      description: "Description 1",
+      category: CategoryEnum.BUG,
+      author: "John Doe",
+    });
   });
 });

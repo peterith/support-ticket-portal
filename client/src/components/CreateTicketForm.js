@@ -18,7 +18,7 @@ const CreateTicketForm = ({ onSubmit }) => {
   `;
 
   const labelStyle = css`
-    font-size: 1.1rem;
+    font-size: 1rem;
   `;
 
   const inputStyle = css`
@@ -32,13 +32,14 @@ const CreateTicketForm = ({ onSubmit }) => {
     font-size: 1rem;
     &:focus {
       outline: none;
-      border-width: 3px;
+      border-width: 2px;
     }
   `;
 
   const textAreaStyle = css`
     height: 100px;
     font-family: inherit;
+    resize: none;
   `;
 
   const optionStyle = css`

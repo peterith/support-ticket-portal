@@ -22,13 +22,13 @@ const Modal = ({ heading, children, onClose }) => {
     border-radius: 10px;
     background-color: #fff;
     box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.3);
-    max-height: 50vh;
+    max-height: 70vh;
     overflow-x: hidden;
     overflow-y: auto;
   `;
 
   const buttonStyle = css`
-    float: right;
+    position: absolute;
     background-color: transparent;
     border: none;
     font-size: 20px;

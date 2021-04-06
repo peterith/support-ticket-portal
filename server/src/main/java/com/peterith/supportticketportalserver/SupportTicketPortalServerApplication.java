@@ -25,8 +25,9 @@ public class SupportTicketPortalServerApplication {
                 registry.addMapping("/tickets")
                         .allowedMethods("GET", "POST")
                         .allowedOrigins(corsOrigin);
+                
                 registry.addMapping("/tickets/*")
-                        .allowedMethods("DELETE")
+                        .allowedMethods("DELETE", "PUT")
                         .allowedOrigins(corsOrigin);
             }
         };

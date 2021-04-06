@@ -3,17 +3,12 @@ import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 
 const FeatureRequestPill = ({ className }) => {
-  const pill = css`
-    padding: 10px 15px;
-    border: 3px solid #567;
-    border-radius: 10px;
+  const pillStyle = css`
     color: #567;
-    user-select: none;
-    font-weight: bold;
   `;
 
   return (
-    <span css={pill} className={className}>
+    <span css={pillStyle} className={className}>
       FEATURE REQUEST
     </span>
   );

@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import TicketTable from "./ticketTable";
 import TicketDisplay from "./TicketDisplay";
 
-const Main = ({ tickets, onDeleteTicket, className }) => {
+const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   const { id } = useParams();
   const history = useHistory();
 
@@ -28,7 +28,6 @@ const Main = ({ tickets, onDeleteTicket, className }) => {
 
   const tableInfoStyle = css`
     text-align: center;
-    font-size: 1.1rem;
   `;
 
   const handleClickRow = (ticket) => {
@@ -37,6 +36,21 @@ const Main = ({ tickets, onDeleteTicket, className }) => {
 
   const handleClickClose = () => {
     history.push(`/tickets`);
+  };
+
+  const handleUpdate = (field) => (value) => {
+    const updatedTicket = {
+      title: selectedTicket.title,
+      description: selectedTicket.description,
+      status: selectedTicket.status,
+      category: selectedTicket.category,
+      priority: selectedTicket.priority,
+      author: selectedTicket.author,
+      agent: selectedTicket.agent,
+      [field]: value,
+    };
+
+    onUpdateTicket(selectedTicket.id, updatedTicket);
   };
 
   return (
@@ -57,6 +71,10 @@ const Main = ({ tickets, onDeleteTicket, className }) => {
           ticket={selectedTicket}
           onClose={handleClickClose}
           onDelete={onDeleteTicket}
+          onUpdateDescription={handleUpdate("description")}
+          onUpdateStatus={handleUpdate("status")}
+          onUpdateCategory={handleUpdate("category")}
+          onUpdatePriority={handleUpdate("priority")}
           css={displayStyle}
         />
       )}
@@ -80,6 +98,7 @@ Main.propTypes = {
     })
   ).isRequired,
   onDeleteTicket: PropTypes.func.isRequired,
+  onUpdateTicket: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 

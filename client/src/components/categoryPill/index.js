@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 import { CategoryEnum } from "../../enums";
 import BugPill from "./BugPill";
@@ -6,15 +8,24 @@ import TechnicalIssuePill from "./TechnicalIssuePill";
 import AccountPill from "./AccountPill";
 
 const CategoryPill = ({ category, className }) => {
+  const pillStyle = css`
+    padding: 8px 10px;
+    border: 2px solid;
+    border-radius: 10px;
+    user-select: none;
+    font-weight: bold;
+    white-space: nowrap;
+  `;
+
   switch (category) {
     case CategoryEnum.BUG:
-      return <BugPill className={className} />;
+      return <BugPill css={pillStyle} className={className} />;
     case CategoryEnum.FEATURE_REQUEST:
-      return <FeatureRequestPill className={className} />;
+      return <FeatureRequestPill css={pillStyle} className={className} />;
     case CategoryEnum.TECHNICAL_ISSUE:
-      return <TechnicalIssuePill className={className} />;
+      return <TechnicalIssuePill css={pillStyle} className={className} />;
     case CategoryEnum.ACCOUNT:
-      return <AccountPill className={className} />;
+      return <AccountPill css={pillStyle} className={className} />;
     default:
       return null;
   }

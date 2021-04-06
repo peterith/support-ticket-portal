@@ -1,8 +1,9 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import CreateTicketForm from "./CreateTicketForm";
+import { CategoryEnum } from "../enums";
 
 describe("Create Ticket Form", () => {
-  it("should call onSubmit when submit form", async () => {
+  it("should call onSubmit when submit form", () => {
     const mockFn = jest.fn();
     render(<CreateTicketForm onSubmit={mockFn} />);
 
@@ -19,6 +20,12 @@ describe("Create Ticket Form", () => {
     fireEvent.click(submitButton);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith({
+      title: "Title 1",
+      description: "Description 1",
+      category: CategoryEnum.BUG,
+      author: "John Doe",
+    });
   });
 
   it("should alert when title is invalid", () => {

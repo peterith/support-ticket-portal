@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
-import useModal from "../hooks/useModal";
+import { useModal } from "../hooks";
 import { ModalTypeEnum } from "../enums";
 
 const Header = ({ onCreateTicket }) => {
@@ -13,7 +13,7 @@ const Header = ({ onCreateTicket }) => {
     padding: 10px 20px;
     background-color: #222;
     color: #fff;
-    height: 80px;
+    height: 60px;
   `;
 
   const buttonStyle = css`
@@ -25,7 +25,7 @@ const Header = ({ onCreateTicket }) => {
     transition: background-color 0.5s;
     color: #fff;
     border: none;
-    font-size: 1.1rem;
+    font-size: 1rem;
     &:hover {
       cursor: pointer;
       background-color: #08f;

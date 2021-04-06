@@ -69,6 +69,19 @@ describe("App", () => {
       (req, res, ctx) => {
         return res(ctx.status(200));
       }
+    ),
+    rest.put(
+      `${process.env.REACT_APP_SERVER_URL}/tickets/1`,
+      (req, res, ctx) => {
+        return res(
+          ctx.json({
+            id: 1,
+            createdAt: "2020-01-05T00:00:00",
+            updatedAt: "2020-01-05T00:00:00",
+            ...req.body,
+          })
+        );
+      }
     )
   );
 
@@ -143,7 +156,7 @@ describe("App", () => {
     expect(totalTickets).toHaveTextContent("2");
   });
 
-  it("should display network error if server is down", async () => {
+  it("should display network error when server is down", async () => {
     server.use(
       rest.get(
         `${process.env.REACT_APP_SERVER_URL}/tickets`,
@@ -169,7 +182,7 @@ describe("App", () => {
     );
   });
 
-  it("should create ticket when click on create button and submit form", async () => {
+  it("should create ticket", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
         <ModalProvider>
@@ -262,7 +275,7 @@ describe("App", () => {
     expect(totalTickets).toHaveTextContent("3");
   });
 
-  it("should delete ticket when click on delete button", async () => {
+  it("should delete ticket", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
         <ModalProvider>
@@ -272,9 +285,9 @@ describe("App", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const article = await waitFor(() => {
-      return screen.getByRole("article", { name: "Ticket 1" });
-    });
+    const article = await waitFor(() =>
+      screen.getByRole("article", { name: "Ticket 1" })
+    );
     const deleteButton = within(article).getByRole("button", {
       name: "delete",
     });
@@ -290,9 +303,7 @@ describe("App", () => {
     const [head, body] = within(table).getAllByRole("rowgroup");
     const headers = within(head).getAllByRole("columnheader");
 
-    const row = await waitFor(() => {
-      return within(body).getByRole("row");
-    });
+    const row = await waitFor(() => within(body).getByRole("row"));
     const ticket = within(row).getAllByRole("cell");
 
     expect(headers[0]).toHaveTextContent("ID");
@@ -313,5 +324,357 @@ describe("App", () => {
 
     const totalTickets = screen.getByLabelText("Total tickets:");
     expect(totalTickets).toHaveTextContent("1");
+  });
+
+  it("should update ticket description", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <ModalProvider>
+          <App />
+        </ModalProvider>
+      </MemoryRouter>
+    );
+
+    const article = await waitFor(() =>
+      screen.getByRole("article", { name: "Ticket 1" })
+    );
+
+    const descriptionButton = within(article).getByRole("button", {
+      name: "Description",
+    });
+    fireEvent.click(descriptionButton);
+
+    const descriptionField1 = within(article).getByRole("textbox", {
+      name: "Description",
+    });
+    fireEvent.change(descriptionField1, {
+      target: { value: "New Description 1" },
+    });
+    fireEvent.blur(descriptionField1);
+
+    const descriptionField2 = within(article).getByLabelText("Description");
+    await waitFor(() => {
+      expect(descriptionField2).toHaveTextContent("New Description 1");
+    });
+
+    const idField = within(article).getByLabelText("ID");
+    expect(idField).toHaveTextContent("1");
+
+    const statusField = within(article).getByLabelText("Status");
+    expect(statusField).toHaveTextContent("Open");
+
+    const categoryField = within(article).getByLabelText("Category");
+    expect(categoryField).toHaveTextContent("BUG");
+
+    const priorityField = within(article).getByLabelText("Priority");
+    const mediumPriority = within(article).getByRole("img", {
+      name: "medium priority",
+    });
+    expect(priorityField).toContainElement(mediumPriority);
+
+    const authorField = within(article).getByLabelText("Author");
+    expect(authorField).toHaveTextContent("John Doe");
+
+    const agentField = within(article).getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("Joe Bloggs");
+
+    const createdField = within(article).getByLabelText("Created");
+    expect(createdField).toBeInTheDocument();
+
+    const modifiedField = within(article).getByLabelText("Modified");
+    expect(modifiedField).toBeInTheDocument();
+  });
+
+  it("should update ticket status", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <ModalProvider>
+          <App />
+        </ModalProvider>
+      </MemoryRouter>
+    );
+
+    const article = await waitFor(() =>
+      screen.getByRole("article", { name: "Ticket 1" })
+    );
+
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
+    fireEvent.click(statusButton);
+
+    const statuses = within(article).getByRole("listbox", { name: "Status" });
+    const resolvedStatus = within(statuses).getByText("Resolved");
+    fireEvent.click(resolvedStatus);
+
+    const heading = within(article).getByRole("heading", { name: "Ticket 1" });
+    expect(heading).toBeInTheDocument();
+
+    const descriptionField = within(article).getByLabelText("Description");
+    expect(descriptionField).toHaveTextContent("Description 1");
+
+    const idField = within(article).getByLabelText("ID");
+    expect(idField).toHaveTextContent("1");
+
+    const statusField = within(article).getByLabelText("Status");
+    await waitFor(() => {
+      expect(statusField).toHaveTextContent("Resolved");
+    });
+
+    const categoryField = within(article).getByLabelText("Category");
+    expect(categoryField).toHaveTextContent("BUG");
+
+    const priorityField = within(article).getByLabelText("Priority");
+    const mediumPriority = within(article).getByRole("img", {
+      name: "medium priority",
+    });
+    expect(priorityField).toContainElement(mediumPriority);
+
+    const authorField = within(article).getByLabelText("Author");
+    expect(authorField).toHaveTextContent("John Doe");
+
+    const agentField = within(article).getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("Joe Bloggs");
+
+    const createdField = within(article).getByLabelText("Created");
+    expect(createdField).toBeInTheDocument();
+
+    const modifiedField = within(article).getByLabelText("Modified");
+    expect(modifiedField).toBeInTheDocument();
+
+    const table = screen.getByRole("table");
+    const [head, body] = within(table).getAllByRole("rowgroup");
+    const headers = within(head).getAllByRole("columnheader");
+
+    const rows = within(body).getAllByRole("row");
+    const ticket1 = within(rows[0]).getAllByRole("cell");
+    const ticket2 = within(rows[1]).getAllByRole("cell");
+
+    expect(headers[0]).toHaveTextContent("ID");
+    expect(headers[1]).toHaveTextContent("Title");
+    expect(headers[2]).toHaveTextContent("Status");
+    expect(headers[3]).toHaveTextContent("Category");
+    expect(headers[4]).toHaveTextContent("Priority");
+
+    expect(ticket1[0]).toHaveTextContent("1");
+    expect(ticket1[1]).toHaveTextContent("Ticket 1");
+    await waitFor(() => {
+      expect(ticket1[2]).toHaveTextContent("Resolved");
+    });
+    expect(ticket1[3]).toHaveTextContent("BUG");
+
+    const mediumPriority1 = within(ticket1[4]).getByRole("img", {
+      name: "medium priority",
+    });
+    expect(ticket1[4]).toContainElement(mediumPriority1);
+
+    expect(ticket2[0]).toHaveTextContent("2");
+    expect(ticket2[1]).toHaveTextContent("Ticket 2");
+    expect(ticket2[2]).toHaveTextContent("In Progress");
+    expect(ticket2[3]).toHaveTextContent("FEATURE REQUEST");
+
+    const highPriority = within(ticket2[4]).getByRole("img", {
+      name: "high priority",
+    });
+    expect(ticket2[4]).toContainElement(highPriority);
+
+    const totalTickets = screen.getByLabelText("Total tickets:");
+    expect(totalTickets).toHaveTextContent("2");
+  });
+
+  it("should update ticket category", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <ModalProvider>
+          <App />
+        </ModalProvider>
+      </MemoryRouter>
+    );
+
+    const article = await waitFor(() =>
+      screen.getByRole("article", { name: "Ticket 1" })
+    );
+
+    const categoryButton = within(article).getByRole("button", {
+      name: "Category",
+    });
+    fireEvent.click(categoryButton);
+
+    const categories = within(article).getByRole("listbox", {
+      name: "Category",
+    });
+    const technicalIssueCategory = within(categories).getByText(
+      "Technical Issue"
+    );
+    fireEvent.click(technicalIssueCategory);
+
+    const heading = within(article).getByRole("heading", { name: "Ticket 1" });
+    expect(heading).toBeInTheDocument();
+
+    const descriptionField = within(article).getByLabelText("Description");
+    expect(descriptionField).toHaveTextContent("Description 1");
+
+    const idField = within(article).getByLabelText("ID");
+    expect(idField).toHaveTextContent("1");
+
+    const statusField = within(article).getByLabelText("Status");
+    expect(statusField).toHaveTextContent("Open");
+
+    const categoryField = within(article).getByLabelText("Category");
+    await waitFor(() => {
+      expect(categoryField).toHaveTextContent("TECHNICAL ISSUE");
+    });
+
+    const priorityField = within(article).getByLabelText("Priority");
+    const mediumPriority = within(article).getByRole("img", {
+      name: "medium priority",
+    });
+    expect(priorityField).toContainElement(mediumPriority);
+
+    const authorField = within(article).getByLabelText("Author");
+    expect(authorField).toHaveTextContent("John Doe");
+
+    const agentField = within(article).getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("Joe Bloggs");
+
+    const createdField = within(article).getByLabelText("Created");
+    expect(createdField).toBeInTheDocument();
+
+    const modifiedField = within(article).getByLabelText("Modified");
+    expect(modifiedField).toBeInTheDocument();
+
+    const table = screen.getByRole("table");
+    const [head, body] = within(table).getAllByRole("rowgroup");
+    const headers = within(head).getAllByRole("columnheader");
+
+    const rows = within(body).getAllByRole("row");
+    const ticket1 = within(rows[0]).getAllByRole("cell");
+    const ticket2 = within(rows[1]).getAllByRole("cell");
+
+    expect(headers[0]).toHaveTextContent("ID");
+    expect(headers[1]).toHaveTextContent("Title");
+    expect(headers[2]).toHaveTextContent("Status");
+    expect(headers[3]).toHaveTextContent("Category");
+    expect(headers[4]).toHaveTextContent("Priority");
+
+    expect(ticket1[0]).toHaveTextContent("1");
+    expect(ticket1[1]).toHaveTextContent("Ticket 1");
+    expect(ticket1[2]).toHaveTextContent("Open");
+    await waitFor(() => {
+      expect(ticket1[3]).toHaveTextContent("TECHNICAL ISSUE");
+    });
+
+    const mediumPriority1 = within(ticket1[4]).getByRole("img", {
+      name: "medium priority",
+    });
+    expect(ticket1[4]).toContainElement(mediumPriority1);
+
+    expect(ticket2[0]).toHaveTextContent("2");
+    expect(ticket2[1]).toHaveTextContent("Ticket 2");
+    expect(ticket2[2]).toHaveTextContent("In Progress");
+    expect(ticket2[3]).toHaveTextContent("FEATURE REQUEST");
+
+    const highPriority = within(ticket2[4]).getByRole("img", {
+      name: "high priority",
+    });
+    expect(ticket2[4]).toContainElement(highPriority);
+
+    const totalTickets = screen.getByLabelText("Total tickets:");
+    expect(totalTickets).toHaveTextContent("2");
+  });
+
+  it("should update ticket priority", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <ModalProvider>
+          <App />
+        </ModalProvider>
+      </MemoryRouter>
+    );
+
+    const article = await waitFor(() =>
+      screen.getByRole("article", { name: "Ticket 1" })
+    );
+
+    const priorityButton = within(article).getByRole("button", {
+      name: "Priority",
+    });
+    fireEvent.click(priorityButton);
+
+    const priorities = within(article).getByRole("listbox", {
+      name: "Priority",
+    });
+    const lowPriority1 = within(priorities).getByText("Low");
+    fireEvent.click(lowPriority1);
+
+    const heading = within(article).getByRole("heading", { name: "Ticket 1" });
+    expect(heading).toBeInTheDocument();
+
+    const descriptionField = within(article).getByLabelText("Description");
+    expect(descriptionField).toHaveTextContent("Description 1");
+
+    const idField = within(article).getByLabelText("ID");
+    expect(idField).toHaveTextContent("1");
+
+    const statusField = within(article).getByLabelText("Status");
+    expect(statusField).toHaveTextContent("Open");
+
+    const categoryField = within(article).getByLabelText("Category");
+    expect(categoryField).toHaveTextContent("BUG");
+
+    const priorityField = within(article).getByLabelText("Priority");
+    const lowPriority2 = await waitFor(() =>
+      within(article).getByRole("img", { name: "low priority" })
+    );
+    expect(priorityField).toContainElement(lowPriority2);
+
+    const authorField = within(article).getByLabelText("Author");
+    expect(authorField).toHaveTextContent("John Doe");
+
+    const agentField = within(article).getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("Joe Bloggs");
+
+    const createdField = within(article).getByLabelText("Created");
+    expect(createdField).toBeInTheDocument();
+
+    const modifiedField = within(article).getByLabelText("Modified");
+    expect(modifiedField).toBeInTheDocument();
+
+    const table = screen.getByRole("table");
+    const [head, body] = within(table).getAllByRole("rowgroup");
+    const headers = within(head).getAllByRole("columnheader");
+
+    const rows = within(body).getAllByRole("row");
+    const ticket1 = within(rows[0]).getAllByRole("cell");
+    const ticket2 = within(rows[1]).getAllByRole("cell");
+
+    expect(headers[0]).toHaveTextContent("ID");
+    expect(headers[1]).toHaveTextContent("Title");
+    expect(headers[2]).toHaveTextContent("Status");
+    expect(headers[3]).toHaveTextContent("Category");
+    expect(headers[4]).toHaveTextContent("Priority");
+
+    expect(ticket1[0]).toHaveTextContent("1");
+    expect(ticket1[1]).toHaveTextContent("Ticket 1");
+    expect(ticket1[2]).toHaveTextContent("Open");
+    expect(ticket1[3]).toHaveTextContent("BUG");
+
+    const lowPriority3 = await waitFor(() =>
+      within(ticket1[4]).getByRole("img", { name: "low priority" })
+    );
+    expect(ticket1[4]).toContainElement(lowPriority3);
+
+    expect(ticket2[0]).toHaveTextContent("2");
+    expect(ticket2[1]).toHaveTextContent("Ticket 2");
+    expect(ticket2[2]).toHaveTextContent("In Progress");
+    expect(ticket2[3]).toHaveTextContent("FEATURE REQUEST");
+
+    const highPriority = within(ticket2[4]).getByRole("img", {
+      name: "high priority",
+    });
+    expect(ticket2[4]).toContainElement(highPriority);
+
+    const totalTickets = screen.getByLabelText("Total tickets:");
+    expect(totalTickets).toHaveTextContent("2");
   });
 });
