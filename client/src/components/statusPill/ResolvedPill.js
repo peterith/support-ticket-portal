@@ -5,10 +5,6 @@ import PropTypes from "prop-types";
 const ResolvedPill = ({ className }) => {
   const pillStyle = css`
     background-color: #f88;
-    padding: 10px;
-    border-radius: 10px;
-    color: #fff;
-    user-select: none;
   `;
 
   return (

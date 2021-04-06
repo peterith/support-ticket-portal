@@ -31,6 +31,10 @@ describe("Ticket Display", () => {
           ticket={ticket}
           onClose={jest.fn()}
           onDelete={jest.fn()}
+          onUpdateDescription={jest.fn()}
+          onUpdateStatus={jest.fn()}
+          onUpdateCategory={jest.fn()}
+          onUpdatePriority={jest.fn()}
         />
       </ModalProvider>
     );
@@ -65,17 +69,25 @@ describe("Ticket Display", () => {
     expect(agentField).toHaveTextContent("Joe Bloggs");
 
     const createdField = within(article).getByLabelText("Created");
-    expect(createdField).toHaveTextContent("1/1/2020, 12:00:00 AM");
+    expect(createdField).toBeInTheDocument();
 
     const modifiedField = within(article).getByLabelText("Modified");
-    expect(modifiedField).toHaveTextContent("1/2/2020, 12:00:00 AM");
+    expect(modifiedField).toBeInTheDocument();
   });
 
   it("should call onClose when click on close button", () => {
     const mockFn = jest.fn();
     render(
       <ModalProvider>
-        <TicketDisplay ticket={ticket} onClose={mockFn} onDelete={jest.fn()} />
+        <TicketDisplay
+          ticket={ticket}
+          onClose={mockFn}
+          onDelete={jest.fn()}
+          onUpdateDescription={jest.fn()}
+          onUpdateStatus={jest.fn()}
+          onUpdateCategory={jest.fn()}
+          onUpdatePriority={jest.fn()}
+        />
       </ModalProvider>
     );
 
@@ -85,14 +97,23 @@ describe("Ticket Display", () => {
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 
-  it("should call onDelete when click on delete button and confirm button", () => {
+  it("should call onDelete when click when delete ticket", () => {
     const mockFn = jest.fn();
     render(
       <ModalProvider>
-        <TicketDisplay ticket={ticket} onClose={jest.fn()} onDelete={mockFn} />
+        <TicketDisplay
+          ticket={ticket}
+          onClose={jest.fn()}
+          onDelete={mockFn}
+          onUpdateDescription={jest.fn()}
+          onUpdateStatus={jest.fn()}
+          onUpdateCategory={jest.fn()}
+          onUpdatePriority={jest.fn()}
+        />
       </ModalProvider>,
       { container: document.body.appendChild(container).firstChild }
     );
+
     const deleteButton = screen.getByRole("button", { name: "delete" });
     fireEvent.click(deleteButton);
 
@@ -100,5 +121,122 @@ describe("Ticket Display", () => {
     fireEvent.click(confirmButton);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith(ticket);
+  });
+
+  it("should call onUpdateDescription when update description", async () => {
+    const mockFn = jest.fn();
+    render(
+      <ModalProvider>
+        <TicketDisplay
+          ticket={ticket}
+          onClose={jest.fn()}
+          onDelete={jest.fn()}
+          onUpdateDescription={mockFn}
+          onUpdateStatus={jest.fn()}
+          onUpdateCategory={jest.fn()}
+          onUpdatePriority={jest.fn()}
+        />
+      </ModalProvider>
+    );
+
+    const descriptionButton = screen.getByRole("button", {
+      name: "Description",
+    });
+    fireEvent.click(descriptionButton);
+
+    const descriptionField = screen.getByRole("textbox", {
+      name: "Description",
+    });
+    fireEvent.change(descriptionField, {
+      target: { value: "New Description 1" },
+    });
+    fireEvent.blur(descriptionField);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith("New Description 1");
+  });
+
+  it("should call onUpdateStatus when update status", async () => {
+    const mockFn = jest.fn();
+    render(
+      <ModalProvider>
+        <TicketDisplay
+          ticket={ticket}
+          onClose={jest.fn()}
+          onDelete={jest.fn()}
+          onUpdateDescription={jest.fn()}
+          onUpdateStatus={mockFn}
+          onUpdateCategory={jest.fn()}
+          onUpdatePriority={jest.fn()}
+        />
+      </ModalProvider>
+    );
+
+    const statusButton = screen.getByRole("button", { name: "Status" });
+    fireEvent.click(statusButton);
+
+    const statuses = screen.getByRole("listbox", { name: "Status" });
+    const resolvedStatus = within(statuses).getByText("Resolved");
+    fireEvent.click(resolvedStatus);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith(StatusEnum.RESOLVED);
+  });
+
+  it("should call onUpdateCategory when update category", async () => {
+    const mockFn = jest.fn();
+    render(
+      <ModalProvider>
+        <TicketDisplay
+          ticket={ticket}
+          onClose={jest.fn()}
+          onDelete={jest.fn()}
+          onUpdateDescription={jest.fn()}
+          onUpdateStatus={jest.fn()}
+          onUpdateCategory={mockFn}
+          onUpdatePriority={jest.fn()}
+        />
+      </ModalProvider>
+    );
+
+    const categoryButton = screen.getByRole("button", { name: "Category" });
+    fireEvent.click(categoryButton);
+
+    const categories = screen.getByRole("listbox", { name: "Category" });
+    const technicalIssueCategory = within(categories).getByText(
+      "Technical Issue"
+    );
+    fireEvent.click(technicalIssueCategory);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith(CategoryEnum.TECHNICAL_ISSUE);
+  });
+
+  it("should call onUpdatePriority when update priority", async () => {
+    const mockFn = jest.fn();
+    render(
+      <ModalProvider>
+        <TicketDisplay
+          ticket={ticket}
+          onClose={jest.fn()}
+          onDelete={jest.fn()}
+          onUpdateDescription={jest.fn()}
+          onUpdateStatus={jest.fn()}
+          onUpdateCategory={jest.fn()}
+          onUpdatePriority={mockFn}
+        />
+      </ModalProvider>
+    );
+
+    const priorityButton = screen.getByRole("button", { name: "Priority" });
+    fireEvent.click(priorityButton);
+
+    const categories = screen.getByRole("listbox", { name: "Priority" });
+    const highPriority = within(categories).getByText("High");
+    fireEvent.click(highPriority);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith(PriorityEnum.HIGH);
   });
 });

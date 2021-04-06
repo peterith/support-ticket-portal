@@ -5,7 +5,7 @@ const TableHead = () => {
   const theadStyle = css`
     background-color: #333;
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   `;
 
   const thStyle = css`

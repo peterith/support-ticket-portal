@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Switch, Route, Redirect, useHistory } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
-import useModal from "../hooks/useModal";
+import { useModal } from "../hooks";
 
 const App = () => {
   const history = useHistory();
@@ -73,6 +73,24 @@ const App = () => {
     history.push(`/tickets`);
   };
 
+  const handleUpdateTicket = async (id, ticket) => {
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_URL}/tickets/${id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ticket),
+      }
+    );
+    const data = await response.json();
+
+    setTickets((previousTickets) => {
+      return previousTickets.map((previousTicket) => {
+        return previousTicket.id === id ? data : previousTicket;
+      });
+    });
+  };
+
   if (networkError) {
     return (
       <p role="alert" css={errorStyle}>
@@ -89,6 +107,7 @@ const App = () => {
           <Main
             tickets={tickets}
             onDeleteTicket={handleDeleteTicket}
+            onUpdateTicket={handleUpdateTicket}
             css={mainStyle}
           />
         </Route>

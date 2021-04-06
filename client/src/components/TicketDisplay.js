@@ -4,13 +4,28 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
+import { EditableSelect, EditableTextArea } from "./editables";
 import StatusPill from "./statusPill";
 import CategoryPill from "./categoryPill";
 import PriorityDisplay from "./PriorityDisplay";
-import useModal from "../hooks/useModal";
-import { ModalTypeEnum } from "../enums";
+import { useModal } from "../hooks";
+import {
+  CategoryEnum,
+  ModalTypeEnum,
+  PriorityEnum,
+  StatusEnum,
+} from "../enums";
 
-const TicketDisplay = ({ ticket, onClose, onDelete, className }) => {
+const TicketDisplay = ({
+  ticket,
+  onClose,
+  onDelete,
+  onUpdateDescription,
+  onUpdateStatus,
+  onUpdateCategory,
+  onUpdatePriority,
+  className,
+}) => {
   const [errorMessage, setErrorMessage] = useState(null);
   const { openModal } = useModal();
 
@@ -43,25 +58,34 @@ const TicketDisplay = ({ ticket, onClose, onDelete, className }) => {
   `;
 
   const h3Style = css`
+    padding: 0px 10px;
     margin: 15px 0px;
   `;
 
   const gridStyle = css`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 40px;
-    align-items: center;
+    grid-auto-rows: minmax(40px, auto);
     margin: 40px 0px;
+  `;
+
+  const cellStyle = css`
+    display: flex;
+    align-items: center;
+    padding: 0px 10px;
   `;
 
   const statusPillStyle = css`
     font-size: 0.8rem;
-    padding: 8px;
+    padding: 7px;
+    border-radius: 7px;
   `;
 
   const categoryPillStyle = css`
     font-size: 0.8rem;
-    padding: 5px 8px;
+    padding: 6px 8px;
+    border: 1px solid;
+    border-radius: 7px;
   `;
 
   const priorityDisplayStyle = css`
@@ -105,35 +129,88 @@ const TicketDisplay = ({ ticket, onClose, onDelete, className }) => {
       <h3 id="ticket-description" css={h3Style}>
         Description
       </h3>
-      <p aria-labelledby="ticket-description">{ticket.description}</p>
+      <EditableTextArea
+        onBlur={onUpdateDescription}
+        ariaLabelledBy="ticket-description"
+      >
+        {ticket.description}
+      </EditableTextArea>
       <div css={gridStyle}>
-        <strong id="ticket-id">ID</strong>
-        <span aria-labelledby="ticket-id">{ticket.id}</span>
-        <strong id="ticket-status">Status</strong>
-        <span aria-labelledby="ticket-status">
+        <div id="ticket-id" css={cellStyle}>
+          <strong>ID</strong>
+        </div>
+        <div aria-labelledby="ticket-id" css={cellStyle}>
+          {ticket.id}
+        </div>
+        <div id="ticket-status" css={cellStyle}>
+          <strong>Status</strong>
+        </div>
+        <EditableSelect
+          options={[
+            { label: "Open", value: StatusEnum.OPEN },
+            { label: "In Progress", value: StatusEnum.IN_PROGRESS },
+            { label: "Resolved", value: StatusEnum.RESOLVED },
+            { label: "Closed", value: StatusEnum.CLOSED },
+          ]}
+          onChange={onUpdateStatus}
+          ariaLabelledBy="ticket-status"
+        >
           <StatusPill status={ticket.status} css={statusPillStyle} />
-        </span>
-        <strong id="ticket-category">Category</strong>
-        <span aria-labelledby="ticket-category">
+        </EditableSelect>
+        <div id="ticket-category" css={cellStyle}>
+          <strong>Category</strong>
+        </div>
+        <EditableSelect
+          options={[
+            { label: "Bug", value: CategoryEnum.BUG },
+            { label: "Feature Request", value: CategoryEnum.FEATURE_REQUEST },
+            { label: "Technical Issue", value: CategoryEnum.TECHNICAL_ISSUE },
+            { label: "Account", value: CategoryEnum.ACCOUNT },
+          ]}
+          onChange={onUpdateCategory}
+          ariaLabelledBy="ticket-category"
+        >
           <CategoryPill category={ticket.category} css={categoryPillStyle} />
-        </span>
-        <strong id="ticket-priority">Priority</strong>
-        <span aria-labelledby="ticket-priority">
+        </EditableSelect>
+        <div id="ticket-priority" css={cellStyle}>
+          <strong>Priority</strong>
+        </div>
+        <EditableSelect
+          options={[
+            { label: "Low", value: PriorityEnum.LOW },
+            { label: "Medium", value: PriorityEnum.MEDIUM },
+            { label: "High", value: PriorityEnum.HIGH },
+          ]}
+          onChange={onUpdatePriority}
+          ariaLabelledBy="ticket-priority"
+        >
           <PriorityDisplay
             priority={ticket.priority}
             css={priorityDisplayStyle}
           />
+        </EditableSelect>
+        <div id="ticket-author" css={cellStyle}>
+          <strong>Author</strong>
+        </div>
+        <span aria-labelledby="ticket-author" css={cellStyle}>
+          {ticket.author}
         </span>
-        <strong id="ticket-author">Author</strong>
-        <span aria-labelledby="ticket-author">{ticket.author}</span>
-        <strong id="ticket-agent">Agent</strong>
-        <span aria-labelledby="ticket-agent">{ticket.agent}</span>
-        <strong id="ticket-created">Created</strong>
-        <span aria-labelledby="ticket-created">
+        <div id="ticket-agent" css={cellStyle}>
+          <strong>Agent</strong>
+        </div>
+        <span aria-labelledby="ticket-agent" css={cellStyle}>
+          {ticket.agent}
+        </span>
+        <div id="ticket-created" css={cellStyle}>
+          <strong>Created</strong>
+        </div>
+        <span aria-labelledby="ticket-created" css={cellStyle}>
           {new Date(ticket.createdAt).toLocaleString()}
         </span>
-        <strong id="ticket-modified">Modified</strong>
-        <span aria-labelledby="ticket-modified">
+        <div id="ticket-modified" css={cellStyle}>
+          <strong>Modified</strong>
+        </div>
+        <span aria-labelledby="ticket-modified" css={cellStyle}>
           {new Date(ticket.updatedAt).toLocaleString()}
         </span>
       </div>
@@ -169,6 +246,10 @@ TicketDisplay.propTypes = {
   }).isRequired,
   onClose: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onUpdateDescription: PropTypes.func.isRequired,
+  onUpdateStatus: PropTypes.func.isRequired,
+  onUpdateCategory: PropTypes.func.isRequired,
+  onUpdatePriority: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 

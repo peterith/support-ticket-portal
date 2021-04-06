@@ -3,16 +3,12 @@ import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 
 const ClosedPill = ({ className }) => {
-  const pill = css`
+  const pillStyle = css`
     background-color: #bbb;
-    padding: 10px;
-    border-radius: 10px;
-    color: #fff;
-    user-select: none;
   `;
 
   return (
-    <span css={pill} className={className}>
+    <span css={pillStyle} className={className}>
       Closed
     </span>
   );
