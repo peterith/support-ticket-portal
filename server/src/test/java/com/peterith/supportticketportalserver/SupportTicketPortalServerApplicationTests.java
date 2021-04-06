@@ -1,10 +1,10 @@
-package com.peterith.tickettrackingserver;
+package com.peterith.supportticketportalserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TicketTrackingServerApplicationTests {
+class SupportTicketPortalServerApplicationTests {
 
     @Test
     void contextLoads() {
