@@ -8,7 +8,7 @@ import { EditableSelect, EditableTextArea } from "./editables";
 import StatusPill from "./statusPill";
 import CategoryPill from "./categoryPill";
 import PriorityDisplay from "./PriorityDisplay";
-import { useModal } from "../hooks";
+import { useAuth, useModal } from "../hooks";
 import {
   CategoryEnum,
   ModalTypeEnum,
@@ -27,6 +27,7 @@ const TicketDisplay = ({
   className,
 }) => {
   const [errorMessage, setErrorMessage] = useState(null);
+  const { user } = useAuth();
   const { openModal } = useModal();
 
   useEffect(() => {
@@ -44,9 +45,7 @@ const TicketDisplay = ({
     background-color: transparent;
     border: none;
     font-size: 20px;
-    &:hover {
-      cursor: pointer;
-    }
+    cursor: pointer;
   `;
 
   const closeButtonStyle = css`
@@ -103,7 +102,15 @@ const TicketDisplay = ({
 
   const onConfirm = async () => {
     try {
-      onDelete(ticket);
+      await onDelete(ticket);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
+  const handleUpdate = (onUpdate) => async (data) => {
+    try {
+      await onUpdate(data);
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -130,7 +137,8 @@ const TicketDisplay = ({
         Description
       </h3>
       <EditableTextArea
-        onBlur={onUpdateDescription}
+        onBlur={handleUpdate(onUpdateDescription)}
+        disabled={!user}
         ariaLabelledBy="ticket-description"
       >
         {ticket.description}
@@ -152,7 +160,8 @@ const TicketDisplay = ({
             { label: "Resolved", value: StatusEnum.RESOLVED },
             { label: "Closed", value: StatusEnum.CLOSED },
           ]}
-          onChange={onUpdateStatus}
+          onChange={handleUpdate(onUpdateStatus)}
+          disabled={!user}
           ariaLabelledBy="ticket-status"
         >
           <StatusPill status={ticket.status} css={statusPillStyle} />
@@ -167,7 +176,8 @@ const TicketDisplay = ({
             { label: "Technical Issue", value: CategoryEnum.TECHNICAL_ISSUE },
             { label: "Account", value: CategoryEnum.ACCOUNT },
           ]}
-          onChange={onUpdateCategory}
+          onChange={handleUpdate(onUpdateCategory)}
+          disabled={!user}
           ariaLabelledBy="ticket-category"
         >
           <CategoryPill category={ticket.category} css={categoryPillStyle} />
@@ -181,7 +191,8 @@ const TicketDisplay = ({
             { label: "Medium", value: PriorityEnum.MEDIUM },
             { label: "High", value: PriorityEnum.HIGH },
           ]}
-          onChange={onUpdatePriority}
+          onChange={handleUpdate(onUpdatePriority)}
+          disabled={!user}
           ariaLabelledBy="ticket-priority"
         >
           <PriorityDisplay
@@ -214,14 +225,19 @@ const TicketDisplay = ({
           {new Date(ticket.updatedAt).toLocaleString()}
         </span>
       </div>
-      <button
-        type="button"
-        onClick={openModal(ModalTypeEnum.DELETE_CONFIRMATION, { onConfirm })}
-        aria-label="delete"
-        css={buttonStyle}
-      >
-        <FontAwesomeIcon icon={faTrashAlt} />
-      </button>
+      {user && (
+        <button
+          type="button"
+          onClick={openModal(ModalTypeEnum.CONFIRMATION, {
+            message: "Are you sure you want to delete this ticket?",
+            onConfirm,
+          })}
+          aria-label="delete"
+          css={buttonStyle}
+        >
+          <FontAwesomeIcon icon={faTrashAlt} />
+        </button>
+      )}
       {errorMessage && (
         <div role="alert" css={errorStyle}>
           {errorMessage}

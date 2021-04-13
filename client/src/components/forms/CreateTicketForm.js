@@ -2,14 +2,13 @@
 import { css } from "@emotion/react";
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { CategoryEnum } from "../enums";
+import { CategoryEnum } from "../../enums";
 
 const CreateTicketForm = ({ onSubmit }) => {
   const [formValues, setFormValues] = useState({
     title: "",
     description: "",
     category: CategoryEnum.BUG,
-    author: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -18,20 +17,20 @@ const CreateTicketForm = ({ onSubmit }) => {
   `;
 
   const labelStyle = css`
-    font-size: 1rem;
+    font-size: 1.1rem;
   `;
 
   const inputStyle = css`
     box-sizing: border-box;
-    margin: 15px 0px;
+    margin: 10px 0px;
     width: 100%;
     border: 2px solid #999;
     border-radius: 5px;
     padding: 8px;
     background-color: #fff;
     font-size: 1rem;
+    outline: none;
     &:focus {
-      outline: none;
       border-width: 2px;
     }
   `;
@@ -47,7 +46,6 @@ const CreateTicketForm = ({ onSubmit }) => {
   `;
 
   const buttonStyle = css`
-    float: right;
     background-color: #09f;
     border-radius: 5px;
     padding: 10px;
@@ -56,8 +54,8 @@ const CreateTicketForm = ({ onSubmit }) => {
     color: #fff;
     border: none;
     font-size: 1rem;
+    cursor: pointer;
     &:hover {
-      cursor: pointer;
       background-color: #08f;
     }
   `;
@@ -73,12 +71,10 @@ const CreateTicketForm = ({ onSubmit }) => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormValues((previousFormValues) => {
-      return {
-        ...previousFormValues,
-        [name]: value,
-      };
-    });
+    setFormValues((previousFormValues) => ({
+      ...previousFormValues,
+      [name]: value,
+    }));
   };
 
   const validateForm = () => {
@@ -88,10 +84,6 @@ const CreateTicketForm = ({ onSubmit }) => {
 
     if (formValues.description.length > 1000) {
       throw new Error("Description should be less than 1000 characters.");
-    }
-
-    if (formValues.author.length === 0) {
-      throw new Error("Author is mandatory.");
     }
   };
 
@@ -157,18 +149,6 @@ const CreateTicketForm = ({ onSubmit }) => {
         </select>
       </label>
       <br />
-      <label htmlFor="form-ticket-author" css={labelStyle}>
-        Author
-        <br />
-        <input
-          type="text"
-          id="form-ticket-author"
-          name="author"
-          value={formValues.author}
-          onChange={handleChange}
-          css={inputStyle}
-        />
-      </label>
       <input type="submit" value="Create" css={buttonStyle} />
       {errorMessage && (
         <div role="alert" css={errorStyle}>

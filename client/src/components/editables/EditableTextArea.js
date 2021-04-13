@@ -3,7 +3,13 @@ import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 
-const EditableTextArea = ({ onBlur, children, ariaLabelledBy, className }) => {
+const EditableTextArea = ({
+  onBlur,
+  disabled,
+  children,
+  ariaLabelledBy,
+  className,
+}) => {
   const [isEditing, setEditing] = useState(false);
   const [textArea, setTextArea] = useState(children);
   const ref = useRef();
@@ -14,8 +20,11 @@ const EditableTextArea = ({ onBlur, children, ariaLabelledBy, className }) => {
     outline: none;
     border-radius: 5px;
     transition: background-color 0.5s;
+  `;
+
+  const enabledStyle = css`
+    cursor: pointer;
     &:hover {
-      cursor: pointer;
       background-color: #222;
     }
   `;
@@ -32,8 +41,8 @@ const EditableTextArea = ({ onBlur, children, ariaLabelledBy, className }) => {
     resize: none;
     padding: 8px;
     font-size: 1rem;
+    outline: none;
     &:focus {
-      outline: none;
       border-width: 2px;
     }
   `;
@@ -56,11 +65,11 @@ const EditableTextArea = ({ onBlur, children, ariaLabelledBy, className }) => {
 
   return (
     <div
-      onClick={handleClickEditable}
-      onKeyDown={handleClickEditable}
-      role="button"
-      tabIndex="0"
-      css={editableStyle}
+      onClick={disabled ? undefined : handleClickEditable}
+      onKeyDown={disabled ? undefined : handleClickEditable}
+      role={disabled ? undefined : "button"}
+      tabIndex={disabled ? -1 : 0}
+      css={[editableStyle, !disabled && enabledStyle]}
       className={className}
     >
       {isEditing ? (
@@ -84,12 +93,14 @@ const EditableTextArea = ({ onBlur, children, ariaLabelledBy, className }) => {
 
 EditableTextArea.propTypes = {
   onBlur: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
   children: PropTypes.string,
   ariaLabelledBy: PropTypes.string,
   className: PropTypes.string,
 };
 
 EditableTextArea.defaultProps = {
+  disabled: false,
   children: "",
   ariaLabelledBy: "",
   className: "",

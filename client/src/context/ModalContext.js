@@ -1,8 +1,8 @@
 import { createContext, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import PropTypes from "prop-types";
-import CreateTicketForm from "../components/CreateTicketForm";
-import DeleteConfirmation from "../components/DeleteConfirmation";
+import { SignInForm, CreateTicketForm } from "../components/forms";
+import Confirmation from "../components/Confirmation";
 import Modal from "../components/Modal";
 import { ModalTypeEnum } from "../enums";
 
@@ -14,10 +14,12 @@ const ModalProvider = ({ children }) => {
 
   const Content = useMemo(() => {
     switch (modalType) {
+      case ModalTypeEnum.SIGN_IN_FORM:
+        return SignInForm;
       case ModalTypeEnum.CREATE_TICKET_FORM:
         return CreateTicketForm;
-      case ModalTypeEnum.DELETE_CONFIRMATION:
-        return DeleteConfirmation;
+      case ModalTypeEnum.CONFIRMATION:
+        return Confirmation;
       default:
         return null;
     }
@@ -25,17 +27,19 @@ const ModalProvider = ({ children }) => {
 
   const title = useMemo(() => {
     switch (modalType) {
+      case ModalTypeEnum.SIGN_IN_FORM:
+        return "Sign In";
       case ModalTypeEnum.CREATE_TICKET_FORM:
-        return "Create ticket";
-      case ModalTypeEnum.DELETE_CONFIRMATION:
-        return "Delete ticket";
+        return "Create Ticket";
+      case ModalTypeEnum.CONFIRMATION:
+        return "Confirmation";
       default:
         return null;
     }
   }, [modalType]);
 
-  const openModal = (newModalType, newFormProps) => () => {
-    setContentProps(newFormProps);
+  const openModal = (newModalType, newContentProps) => () => {
+    setContentProps(newContentProps);
     setModalType(newModalType);
   };
 

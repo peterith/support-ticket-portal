@@ -1,3 +1,8 @@
+export const RoleEnum = {
+  CLIENT: "CLIENT",
+  AGENT: "AGENT",
+};
+
 export const StatusEnum = {
   OPEN: "OPEN",
   IN_PROGRESS: "IN_PROGRESS",
@@ -19,6 +24,7 @@ export const PriorityEnum = {
 };
 
 export const ModalTypeEnum = {
+  SIGN_IN_FORM: "SIGN_IN_FORM",
   CREATE_TICKET_FORM: "CREATE_TICKET_FORM",
-  DELETE_CONFIRMATION: "DELETE_CONFIRMATION",
+  CONFIRMATION: "CONFIRMATION",
 };

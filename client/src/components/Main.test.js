@@ -1,8 +1,8 @@
 import { MemoryRouter, Route } from "react-router-dom";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import Main from "./Main";
-import { ModalProvider } from "../context/ModalContext";
-import { StatusEnum, CategoryEnum, PriorityEnum } from "../enums";
+import { AuthProvider, ModalProvider } from "../context";
+import { StatusEnum, CategoryEnum, PriorityEnum, RoleEnum } from "../enums";
 
 describe("Main", () => {
   const appRoot = document.createElement("div");
@@ -20,46 +20,35 @@ describe("Main", () => {
       status: StatusEnum.OPEN,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.MEDIUM,
-      author: "John Doe",
-      agent: "Joe Bloggs",
+      author: "noobMaster",
+      agent: "agent007",
       createdAt: "2020-01-01T00:00:00",
       updatedAt: "2020-01-02T00:00:00",
     },
-    {
-      id: 2,
-      title: "Ticket 2",
-      description: "Description 2",
-      status: StatusEnum.IN_PROGRESS,
-      category: CategoryEnum.FEATURE_REQUEST,
-      priority: PriorityEnum.HIGH,
-      author: "Jane Doe",
-      agent: "Joe Schmoe",
-      createdAt: "2020-01-03T00:00:00",
-      updatedAt: "2020-01-04T00:00:00",
-    },
   ];
 
-  it("should display ticket table and total tickets", async () => {
+  it("should render ticket table and total tickets", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={jest.fn()}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
     const table = screen.getByRole("table");
     const [head, body] = within(table).getAllByRole("rowgroup");
     const headers = within(head).getAllByRole("columnheader");
-    const rows = within(body).getAllByRole("row");
-    const ticket1 = within(rows[0]).getAllByRole("cell");
-    const ticket2 = within(rows[1]).getAllByRole("cell");
+    const row = within(body).getByRole("row");
+    const ticket = within(row).getAllByRole("cell");
 
     expect(headers[0]).toHaveTextContent("ID");
     expect(headers[1]).toHaveTextContent("Title");
@@ -67,42 +56,34 @@ describe("Main", () => {
     expect(headers[3]).toHaveTextContent("Category");
     expect(headers[4]).toHaveTextContent("Priority");
 
-    expect(ticket1[0]).toHaveTextContent("1");
-    expect(ticket1[1]).toHaveTextContent("Ticket 1");
-    expect(ticket1[2]).toHaveTextContent("Open");
-    expect(ticket1[3]).toHaveTextContent("BUG");
+    expect(ticket[0]).toHaveTextContent("1");
+    expect(ticket[1]).toHaveTextContent("Ticket 1");
+    expect(ticket[2]).toHaveTextContent("Open");
+    expect(ticket[3]).toHaveTextContent("BUG");
 
-    const mediumPriority = within(ticket1[4]).getByRole("img", {
+    const mediumPriority = within(ticket[4]).getByRole("img", {
       name: "medium priority",
     });
-    expect(ticket1[4]).toContainElement(mediumPriority);
-
-    expect(ticket2[0]).toHaveTextContent("2");
-    expect(ticket2[1]).toHaveTextContent("Ticket 2");
-    expect(ticket2[2]).toHaveTextContent("In Progress");
-    expect(ticket2[3]).toHaveTextContent("FEATURE REQUEST");
-
-    const highPriority = within(ticket2[4]).getByRole("img", {
-      name: "high priority",
-    });
-    expect(ticket2[4]).toContainElement(highPriority);
+    expect(ticket[4]).toContainElement(mediumPriority);
 
     const totalTickets = screen.getByLabelText("Total tickets:");
-    expect(totalTickets).toHaveTextContent("2");
+    expect(totalTickets).toHaveTextContent("1");
   });
 
   it("should render ticket display when click on table row", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={jest.fn()}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -134,10 +115,10 @@ describe("Main", () => {
     expect(priorityField).toContainElement(mediumPriority);
 
     const authorField = within(article).getByLabelText("Author");
-    expect(authorField).toHaveTextContent("John Doe");
+    expect(authorField).toHaveTextContent("noobMaster");
 
     const agentField = within(article).getByLabelText("Agent");
-    expect(agentField).toHaveTextContent("Joe Bloggs");
+    expect(agentField).toHaveTextContent("agent007");
 
     const createdField = within(article).getByLabelText("Created");
     expect(createdField).toBeInTheDocument();
@@ -149,15 +130,17 @@ describe("Main", () => {
   it("should render ticket display when URL path is /tickets/:id", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={jest.fn()}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -185,10 +168,10 @@ describe("Main", () => {
     expect(priorityField).toContainElement(mediumPriority);
 
     const authorField = within(article).getByLabelText("Author");
-    expect(authorField).toHaveTextContent("John Doe");
+    expect(authorField).toHaveTextContent("noobMaster");
 
     const agentField = within(article).getByLabelText("Agent");
-    expect(agentField).toHaveTextContent("Joe Bloggs");
+    expect(agentField).toHaveTextContent("agent007");
 
     const createdField = within(article).getByLabelText("Created");
     expect(createdField).toBeInTheDocument();
@@ -200,15 +183,17 @@ describe("Main", () => {
   it("should close ticket display when click on close button", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={jest.fn()}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -220,18 +205,21 @@ describe("Main", () => {
   });
 
   it("should call onDeleteTicket when delete ticket", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={mockFn}
-              onUpdateTicket={jest.fn()}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider initialUser={initialUser}>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={mockFn}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>,
       { container: document.body.appendChild(container).firstChild }
     );
@@ -242,7 +230,7 @@ describe("Main", () => {
     });
     fireEvent.click(deleteButton);
 
-    const modal = screen.getByRole("dialog", { name: "Delete ticket" });
+    const modal = screen.getByRole("dialog", { name: "Confirmation" });
     const confirmButton = within(modal).getByRole("button", {
       name: "Confirm",
     });
@@ -253,18 +241,21 @@ describe("Main", () => {
   });
 
   it("should call onUpdateTicket when update description", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={mockFn}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider initialUser={initialUser}>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={mockFn}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -290,24 +281,26 @@ describe("Main", () => {
       status: StatusEnum.OPEN,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.MEDIUM,
-      author: "John Doe",
-      agent: "Joe Bloggs",
+      agent: "agent007",
     });
   });
 
   it("should call onUpdateTicket when update status", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={mockFn}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider initialUser={initialUser}>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={mockFn}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -329,24 +322,26 @@ describe("Main", () => {
       status: StatusEnum.RESOLVED,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.MEDIUM,
-      author: "John Doe",
-      agent: "Joe Bloggs",
+      agent: "agent007",
     });
   });
 
   it("should call onUpdateTicket when update category", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={mockFn}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider initialUser={initialUser}>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={mockFn}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -372,24 +367,26 @@ describe("Main", () => {
       status: StatusEnum.OPEN,
       category: CategoryEnum.TECHNICAL_ISSUE,
       priority: PriorityEnum.MEDIUM,
-      author: "John Doe",
-      agent: "Joe Bloggs",
+      agent: "agent007",
     });
   });
 
   it("should call onUpdateTicket when update priority", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
       <MemoryRouter initialEntries={["/tickets/1"]}>
-        <ModalProvider>
-          <Route exact path={["/tickets", "/tickets/:id"]}>
-            <Main
-              tickets={tickets}
-              onDeleteTicket={jest.fn()}
-              onUpdateTicket={mockFn}
-            />
-          </Route>
-        </ModalProvider>
+        <AuthProvider initialUser={initialUser}>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={tickets}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={mockFn}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
       </MemoryRouter>
     );
 
@@ -413,8 +410,7 @@ describe("Main", () => {
       status: StatusEnum.OPEN,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.HIGH,
-      author: "John Doe",
-      agent: "Joe Bloggs",
+      agent: "agent007",
     });
   });
 });

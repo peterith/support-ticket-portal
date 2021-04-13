@@ -32,9 +32,7 @@ const Modal = ({ heading, children, onClose }) => {
     background-color: transparent;
     border: none;
     font-size: 20px;
-    &:hover {
-      cursor: pointer;
-    }
+    cursor: pointer;
   `;
 
   const headingStyle = css`

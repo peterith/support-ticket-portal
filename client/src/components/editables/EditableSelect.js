@@ -7,6 +7,7 @@ import { useClickOutside } from "../../hooks";
 const EditableSelect = ({
   options,
   onChange,
+  disabled,
   children,
   ariaLabelledBy,
   className,
@@ -30,16 +31,13 @@ const EditableSelect = ({
     outline: none;
     border-radius: 5px;
     transition: background-color 0.5s;
-    &:hover {
-      cursor: pointer;
-      background-color: #222;
-    }
   `;
 
-  const fieldStyle = css`
-    flex-grow: 1;
-    display: flex;
-    outline: none;
+  const enabledStyle = css`
+    cursor: pointer;
+    &:hover {
+      background-color: #222;
+    }
   `;
 
   const listStyle = css`
@@ -58,8 +56,8 @@ const EditableSelect = ({
     padding: 5px;
     width: 100px;
     transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
     &:hover {
-      cursor: pointer;
       color: #fff;
       background-color: #333;
     }
@@ -69,23 +67,23 @@ const EditableSelect = ({
     setEditing(true);
   };
 
-  const handleClickOption = (value) => () => {
+  const handleClickOption = (value) => (event) => {
     setEditing(false);
     onChange(value);
+    event.stopPropagation();
   };
 
   return (
-    <div css={editableStyle} className={className}>
-      <div
-        onClick={handleClickEditable}
-        onKeyDown={handleClickEditable}
-        role="button"
-        tabIndex="0"
-        aria-labelledby={ariaLabelledBy}
-        css={fieldStyle}
-      >
-        {children}
-      </div>
+    <div
+      onClick={disabled ? undefined : handleClickEditable}
+      onKeyDown={disabled ? undefined : handleClickEditable}
+      role={disabled ? undefined : "button"}
+      tabIndex={disabled ? -1 : 0}
+      aria-labelledby={ariaLabelledBy}
+      css={[editableStyle, !disabled && enabledStyle]}
+      className={className}
+    >
+      {children}
       {isEditing && (
         <ul
           ref={ref}
@@ -122,12 +120,14 @@ EditableSelect.propTypes = {
     })
   ).isRequired,
   onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
   children: PropTypes.element.isRequired,
   ariaLabelledBy: PropTypes.string,
   className: PropTypes.string,
 };
 
 EditableSelect.defaultProps = {
+  disabled: false,
   ariaLabelledBy: "",
   className: "",
 };

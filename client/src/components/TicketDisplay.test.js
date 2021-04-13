@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import TicketDisplay from "./TicketDisplay";
-import { ModalProvider } from "../context/ModalContext";
-import { StatusEnum, CategoryEnum, PriorityEnum } from "../enums";
+import { AuthProvider, ModalProvider } from "../context";
+import { StatusEnum, CategoryEnum, PriorityEnum, RoleEnum } from "../enums";
 
 describe("Ticket Display", () => {
   const appRoot = document.createElement("div");
@@ -18,77 +18,150 @@ describe("Ticket Display", () => {
     status: StatusEnum.OPEN,
     category: CategoryEnum.BUG,
     priority: PriorityEnum.MEDIUM,
-    author: "John Doe",
-    agent: "Joe Bloggs",
+    author: "noobMaster",
+    agent: "agent007",
     createdAt: "2020-01-01T00:00:00",
     updatedAt: "2020-01-02T00:00:00",
   };
 
   it("should render ticket display", () => {
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={jest.fn()}
-          onDelete={jest.fn()}
-          onUpdateDescription={jest.fn()}
-          onUpdateStatus={jest.fn()}
-          onUpdateCategory={jest.fn()}
-          onUpdatePriority={jest.fn()}
-        />
-      </ModalProvider>
+      <AuthProvider>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
     );
 
-    const article = screen.getByRole("article", { name: "Ticket 1" });
-
-    const heading = within(article).getByRole("heading", { name: "Ticket 1" });
+    const heading = screen.getByRole("heading", { name: "Ticket 1" });
     expect(heading).toBeInTheDocument();
 
-    const descriptionField = within(article).getByLabelText("Description");
+    const descriptionField = screen.getByLabelText("Description");
     expect(descriptionField).toHaveTextContent("Description 1");
 
-    const idField = within(article).getByLabelText("ID");
+    const idField = screen.getByLabelText("ID");
     expect(idField).toHaveTextContent("1");
 
-    const statusField = within(article).getByLabelText("Status");
+    const statusField = screen.getByLabelText("Status");
     expect(statusField).toHaveTextContent("Open");
 
-    const categoryField = within(article).getByLabelText("Category");
+    const categoryField = screen.getByLabelText("Category");
     expect(categoryField).toHaveTextContent("BUG");
 
-    const priorityField = within(article).getByLabelText("Priority");
-    const mediumPriority = within(article).getByRole("img", {
+    const priorityField = screen.getByLabelText("Priority");
+    const mediumPriority = screen.getByRole("img", {
       name: "medium priority",
     });
     expect(priorityField).toContainElement(mediumPriority);
 
-    const authorField = within(article).getByLabelText("Author");
-    expect(authorField).toHaveTextContent("John Doe");
+    const authorField = screen.getByLabelText("Author");
+    expect(authorField).toHaveTextContent("noobMaster");
 
-    const agentField = within(article).getByLabelText("Agent");
-    expect(agentField).toHaveTextContent("Joe Bloggs");
+    const agentField = screen.getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("agent007");
 
-    const createdField = within(article).getByLabelText("Created");
+    const createdField = screen.getByLabelText("Created");
     expect(createdField).toBeInTheDocument();
 
-    const modifiedField = within(article).getByLabelText("Modified");
+    const modifiedField = screen.getByLabelText("Modified");
     expect(modifiedField).toBeInTheDocument();
   });
 
-  it("should call onClose when click on close button", () => {
+  it("should not render update and delete components when user signed in", () => {
+    render(
+      <AuthProvider>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const descriptionButton = screen.queryByRole("button", {
+      name: "Description",
+    });
+    expect(descriptionButton).not.toBeInTheDocument();
+
+    const statusButton = screen.queryByRole("button", { name: "Status" });
+    expect(statusButton).not.toBeInTheDocument();
+
+    const categoryButton = screen.queryByRole("button", { name: "Category" });
+    expect(categoryButton).not.toBeInTheDocument();
+
+    const priorityButton = screen.queryByRole("button", { name: "Priority" });
+    expect(priorityButton).not.toBeInTheDocument();
+
+    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    expect(deleteButton).not.toBeInTheDocument();
+  });
+
+  it("should render update and delete components when user signed in", () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const descriptionButton = screen.getByRole("button", {
+      name: "Description",
+    });
+    expect(descriptionButton).toBeInTheDocument();
+
+    const statusButton = screen.getByRole("button", { name: "Status" });
+    expect(statusButton).toBeInTheDocument();
+
+    const categoryButton = screen.getByRole("button", { name: "Category" });
+    expect(categoryButton).toBeInTheDocument();
+
+    const priorityButton = screen.getByRole("button", { name: "Priority" });
+    expect(priorityButton).toBeInTheDocument();
+
+    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    expect(deleteButton).toBeInTheDocument();
+  });
+
+  it("should call onClose when close display", () => {
     const mockFn = jest.fn();
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={mockFn}
-          onDelete={jest.fn()}
-          onUpdateDescription={jest.fn()}
-          onUpdateStatus={jest.fn()}
-          onUpdateCategory={jest.fn()}
-          onUpdatePriority={jest.fn()}
-        />
-      </ModalProvider>
+      <AuthProvider>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={mockFn}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
     );
 
     const closeButton = screen.getByRole("button", { name: "close" });
@@ -97,27 +170,33 @@ describe("Ticket Display", () => {
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 
-  it("should call onDelete when click when delete ticket", () => {
+  it("should call onDelete when delete ticket", () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={jest.fn()}
-          onDelete={mockFn}
-          onUpdateDescription={jest.fn()}
-          onUpdateStatus={jest.fn()}
-          onUpdateCategory={jest.fn()}
-          onUpdatePriority={jest.fn()}
-        />
-      </ModalProvider>,
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={mockFn}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>,
       { container: document.body.appendChild(container).firstChild }
     );
 
     const deleteButton = screen.getByRole("button", { name: "delete" });
     fireEvent.click(deleteButton);
 
-    const confirmButton = screen.getByRole("button", { name: "Confirm" });
+    const modal = screen.getByRole("dialog", { name: "Confirmation" });
+    const confirmButton = within(modal).getByRole("button", {
+      name: "Confirm",
+    });
     fireEvent.click(confirmButton);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
@@ -125,19 +204,22 @@ describe("Ticket Display", () => {
   });
 
   it("should call onUpdateDescription when update description", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={jest.fn()}
-          onDelete={jest.fn()}
-          onUpdateDescription={mockFn}
-          onUpdateStatus={jest.fn()}
-          onUpdateCategory={jest.fn()}
-          onUpdatePriority={jest.fn()}
-        />
-      </ModalProvider>
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={mockFn}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
     );
 
     const descriptionButton = screen.getByRole("button", {
@@ -158,19 +240,22 @@ describe("Ticket Display", () => {
   });
 
   it("should call onUpdateStatus when update status", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={jest.fn()}
-          onDelete={jest.fn()}
-          onUpdateDescription={jest.fn()}
-          onUpdateStatus={mockFn}
-          onUpdateCategory={jest.fn()}
-          onUpdatePriority={jest.fn()}
-        />
-      </ModalProvider>
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={mockFn}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
     );
 
     const statusButton = screen.getByRole("button", { name: "Status" });
@@ -185,19 +270,22 @@ describe("Ticket Display", () => {
   });
 
   it("should call onUpdateCategory when update category", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={jest.fn()}
-          onDelete={jest.fn()}
-          onUpdateDescription={jest.fn()}
-          onUpdateStatus={jest.fn()}
-          onUpdateCategory={mockFn}
-          onUpdatePriority={jest.fn()}
-        />
-      </ModalProvider>
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={mockFn}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
     );
 
     const categoryButton = screen.getByRole("button", { name: "Category" });
@@ -214,19 +302,22 @@ describe("Ticket Display", () => {
   });
 
   it("should call onUpdatePriority when update priority", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
-      <ModalProvider>
-        <TicketDisplay
-          ticket={ticket}
-          onClose={jest.fn()}
-          onDelete={jest.fn()}
-          onUpdateDescription={jest.fn()}
-          onUpdateStatus={jest.fn()}
-          onUpdateCategory={jest.fn()}
-          onUpdatePriority={mockFn}
-        />
-      </ModalProvider>
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={mockFn}
+          />
+        </ModalProvider>
+      </AuthProvider>
     );
 
     const priorityButton = screen.getByRole("button", { name: "Priority" });

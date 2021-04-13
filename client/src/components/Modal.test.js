@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import Modal from "./Modal";
 
 describe("Modal", () => {
-  it("should display ticket table and total tickets", async () => {
+  it("should render modal", async () => {
     render(
       <Modal heading="Create ticket" onClose={jest.fn()}>
         <div data-testid="test" />
@@ -16,7 +16,7 @@ describe("Modal", () => {
     expect(content).toBeInTheDocument();
   });
 
-  it("should call onClose when click on close button", async () => {
+  it("should call onClose when close modal", async () => {
     const mockFn = jest.fn();
     render(
       <Modal heading="Create ticket" onClose={mockFn}>
