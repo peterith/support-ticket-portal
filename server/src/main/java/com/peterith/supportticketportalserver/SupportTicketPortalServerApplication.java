@@ -22,10 +22,14 @@ public class SupportTicketPortalServerApplication {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/authenticate")
+                        .allowedMethods("POST")
+                        .allowedOrigins(corsOrigin);
+
                 registry.addMapping("/tickets")
                         .allowedMethods("GET", "POST")
                         .allowedOrigins(corsOrigin);
-                
+
                 registry.addMapping("/tickets/*")
                         .allowedMethods("DELETE", "PUT")
                         .allowedOrigins(corsOrigin);

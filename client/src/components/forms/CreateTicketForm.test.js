@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import CreateTicketForm from "./CreateTicketForm";
-import { CategoryEnum } from "../enums";
+import { CategoryEnum } from "../../enums";
 
 describe("Create Ticket Form", () => {
   it("should call onSubmit when submit form", () => {
@@ -13,9 +13,6 @@ describe("Create Ticket Form", () => {
     const descriptionField = screen.getByLabelText("Description");
     fireEvent.change(descriptionField, { target: { value: "Description 1" } });
 
-    const authorField = screen.getByLabelText("Author");
-    fireEvent.change(authorField, { target: { value: "John Doe" } });
-
     const submitButton = screen.getByRole("button", { name: "Create" });
     fireEvent.click(submitButton);
 
@@ -24,8 +21,26 @@ describe("Create Ticket Form", () => {
       title: "Title 1",
       description: "Description 1",
       category: CategoryEnum.BUG,
-      author: "John Doe",
     });
+  });
+
+  it("should alert when onSubmit throws error", () => {
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(<CreateTicketForm onSubmit={mockFn} />);
+
+    const titleField = screen.getByLabelText("Title");
+    fireEvent.change(titleField, { target: { value: "Title 1" } });
+
+    const descriptionField = screen.getByLabelText("Description");
+    fireEvent.change(descriptionField, { target: { value: "Description 1" } });
+
+    const submitButton = screen.getByRole("button", { name: "Create" });
+    fireEvent.click(submitButton);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
   });
 
   it("should alert when title is invalid", () => {
@@ -34,9 +49,6 @@ describe("Create Ticket Form", () => {
 
     const descriptionField = screen.getByLabelText("Description");
     fireEvent.change(descriptionField, { target: { value: "Description 1" } });
-
-    const authorField = screen.getByLabelText("Author");
-    fireEvent.change(authorField, { target: { value: "John Doe" } });
 
     const submitButton = screen.getByRole("button", { name: "Create" });
     fireEvent.click(submitButton);
@@ -57,9 +69,6 @@ describe("Create Ticket Form", () => {
     const descriptionField = screen.getByLabelText("Description");
     fireEvent.change(descriptionField, { target: { value: "x".repeat(1001) } });
 
-    const authorField = screen.getByLabelText("Author");
-    fireEvent.change(authorField, { target: { value: "John Doe" } });
-
     const submitButton = screen.getByRole("button", { name: "Create" });
     fireEvent.click(submitButton);
 
@@ -67,22 +76,5 @@ describe("Create Ticket Form", () => {
     expect(alert).toHaveTextContent(
       "Description should be less than 1000 characters."
     );
-  });
-
-  it("should alert when author is invalid", () => {
-    const mockFn = jest.fn();
-    render(<CreateTicketForm onSubmit={mockFn} />);
-
-    const titleField = screen.getByLabelText("Title");
-    fireEvent.change(titleField, { target: { value: "Title 1" } });
-
-    const descriptionField = screen.getByLabelText("Description");
-    fireEvent.change(descriptionField, { target: { value: "Description 1" } });
-
-    const submitButton = screen.getByRole("button", { name: "Create" });
-    fireEvent.click(submitButton);
-
-    const alert = screen.getByRole("alert");
-    expect(alert).toHaveTextContent("Author is mandatory.");
   });
 });

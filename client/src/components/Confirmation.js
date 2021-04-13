@@ -2,7 +2,7 @@
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 
-const DeleteConfirmation = ({ onConfirm }) => {
+const Confirmation = ({ message, onConfirm }) => {
   const buttonStyle = css`
     float: right;
     background-color: #f77;
@@ -13,8 +13,8 @@ const DeleteConfirmation = ({ onConfirm }) => {
     color: #fff;
     border: none;
     font-size: 1rem;
+    cursor: pointer;
     &:hover {
-      cursor: pointer;
       background-color: #f55;
     }
   `;
@@ -25,7 +25,7 @@ const DeleteConfirmation = ({ onConfirm }) => {
 
   return (
     <div>
-      <p css={textStyle}>Are you sure you want to delete this ticket?</p>
+      <p css={textStyle}>{message}</p>
       <button type="button" onClick={onConfirm} css={buttonStyle}>
         Confirm
       </button>
@@ -33,8 +33,9 @@ const DeleteConfirmation = ({ onConfirm }) => {
   );
 };
 
-DeleteConfirmation.propTypes = {
+Confirmation.propTypes = {
+  message: PropTypes.string.isRequired,
   onConfirm: PropTypes.func.isRequired,
 };
 
-export default DeleteConfirmation;
+export default Confirmation;

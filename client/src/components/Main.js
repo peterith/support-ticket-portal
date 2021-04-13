@@ -23,7 +23,7 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   `;
 
   const displayStyle = css`
-    flex: 0 0 400px;
+    flex: 0 0 300px;
   `;
 
   const tableInfoStyle = css`
@@ -38,19 +38,18 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     history.push(`/tickets`);
   };
 
-  const handleUpdate = (field) => (value) => {
+  const handleUpdate = (field) => async (value) => {
     const updatedTicket = {
       title: selectedTicket.title,
       description: selectedTicket.description,
       status: selectedTicket.status,
       category: selectedTicket.category,
       priority: selectedTicket.priority,
-      author: selectedTicket.author,
       agent: selectedTicket.agent,
       [field]: value,
     };
 
-    onUpdateTicket(selectedTicket.id, updatedTicket);
+    await onUpdateTicket(selectedTicket.id, updatedTicket);
   };
 
   return (

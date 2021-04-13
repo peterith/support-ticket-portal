@@ -11,26 +11,14 @@ describe("Ticket Table", () => {
       status: StatusEnum.OPEN,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.MEDIUM,
-      author: "John Doe",
-      agent: "Joe Bloggs",
+      author: "noobMaster",
+      agent: "agent007",
       createdAt: "2020-01-01T00:00:00",
       updatedAt: "2020-01-02T00:00:00",
     },
-    {
-      id: 2,
-      title: "Ticket 2",
-      description: "Description 2",
-      status: StatusEnum.IN_PROGRESS,
-      category: CategoryEnum.FEATURE_REQUEST,
-      priority: PriorityEnum.HIGH,
-      author: "Jane Doe",
-      agent: "Joe Schmoe",
-      createdAt: "2020-01-03T00:00:00",
-      updatedAt: "2020-01-04T00:00:00",
-    },
   ];
 
-  it("should display tickets", () => {
+  it("should render ticket table", () => {
     render(
       <TicketTable tickets={tickets} selectedRow={0} onClickRow={jest.fn()} />
     );
@@ -38,9 +26,8 @@ describe("Ticket Table", () => {
     const table = screen.getByRole("table");
     const [head, body] = within(table).getAllByRole("rowgroup");
     const headers = within(head).getAllByRole("columnheader");
-    const rows = within(body).getAllByRole("row");
-    const ticket1 = within(rows[0]).getAllByRole("cell");
-    const ticket2 = within(rows[1]).getAllByRole("cell");
+    const row = within(body).getByRole("row");
+    const ticket = within(row).getAllByRole("cell");
 
     expect(headers[0]).toHaveTextContent("ID");
     expect(headers[1]).toHaveTextContent("Title");
@@ -48,25 +35,15 @@ describe("Ticket Table", () => {
     expect(headers[3]).toHaveTextContent("Category");
     expect(headers[4]).toHaveTextContent("Priority");
 
-    expect(ticket1[0]).toHaveTextContent("1");
-    expect(ticket1[1]).toHaveTextContent("Ticket 1");
-    expect(ticket1[2]).toHaveTextContent("Open");
-    expect(ticket1[3]).toHaveTextContent("BUG");
+    expect(ticket[0]).toHaveTextContent("1");
+    expect(ticket[1]).toHaveTextContent("Ticket 1");
+    expect(ticket[2]).toHaveTextContent("Open");
+    expect(ticket[3]).toHaveTextContent("BUG");
 
-    const mediumPriority = within(ticket1[4]).getByRole("img", {
+    const mediumPriority = within(ticket[4]).getByRole("img", {
       name: "medium priority",
     });
-    expect(ticket1[4]).toContainElement(mediumPriority);
-
-    expect(ticket2[0]).toHaveTextContent("2");
-    expect(ticket2[1]).toHaveTextContent("Ticket 2");
-    expect(ticket2[2]).toHaveTextContent("In Progress");
-    expect(ticket2[3]).toHaveTextContent("FEATURE REQUEST");
-
-    const highPriority = within(ticket2[4]).getByRole("img", {
-      name: "high priority",
-    });
-    expect(ticket2[4]).toContainElement(highPriority);
+    expect(ticket[4]).toContainElement(mediumPriority);
   });
 
   it("should call onClick callback when click row", () => {

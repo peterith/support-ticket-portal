@@ -36,4 +36,18 @@ describe("Editable Select", () => {
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn).toHaveBeenCalledWith("1");
   });
+
+  it("should not be editable when disabled", () => {
+    render(
+      <EditableSelect options={options} onChange={jest.fn()} disabled>
+        <div data-testid="test" />
+      </EditableSelect>
+    );
+
+    const children = screen.getByTestId("test");
+    fireEvent.click(children);
+
+    const list = screen.queryByRole("listbox");
+    expect(list).not.toBeInTheDocument();
+  });
 });

@@ -11,8 +11,8 @@ const TableRow = ({ ticket, onClick, selected }) => {
     border-bottom: 2px solid #e0e0e0;
     box-shadow: ${selected && "0px 5px 20px rgba(0, 0, 0, 0.3)"};
     outline: none;
+    cursor: pointer;
     &:hover {
-      cursor: pointer;
       background-color: ${!selected && "#e0e0e0"};
     }
   `;

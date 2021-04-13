@@ -36,4 +36,15 @@ describe("Editable Text Area", () => {
 
     expect(mockFn).toHaveBeenCalledTimes(0);
   });
+
+  it("should not be editable when disabled", () => {
+    render(
+      <EditableTextArea onBlur={jest.fn()} disabled>
+        Test text
+      </EditableTextArea>
+    );
+
+    const button = screen.queryByRole("button");
+    expect(button).not.toBeInTheDocument();
+  });
 });
