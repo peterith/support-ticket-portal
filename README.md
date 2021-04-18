@@ -2,6 +2,9 @@
 
 A customer support ticket portal for SaaS companies.
 
+[Video Link](https://drive.google.com/file/d/1bRuLgk_EEK-N4kR_NXd0XzysFvr_mQOk/view?usp=sharing)
+[Jira Invite Link](https://id.atlassian.com/invite/p/jira-software?id=LT94RFBGTXGS8fQwb8584A)
+
 ## Roadmap
 
 - 1.0 - Minimum variable product
