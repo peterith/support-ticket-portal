@@ -32,9 +32,7 @@ pipeline {
             steps {
                 dir('client') {
                     script {
-                        docker.withRegistry('https://registry.hub.docker.com', 'docker-credentials') {
-                            docker.build('peterith/support-ticket-portal-client').push('latest')
-                        }   
+                        docker.build('peterith/support-ticket-portal-client').push('latest')
                     }
                 }     
             }
