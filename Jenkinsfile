@@ -24,7 +24,7 @@ pipeline {
         stage('Server - Deploy') {
             steps {
                 dir('server') {
-                    sh './mvnw package'
+                    sh './mvnw package -Dmaven.test.skip=true'
                     script {
                         docker.build('peterith/support-ticket-portal-server').push('latest')
                     }
