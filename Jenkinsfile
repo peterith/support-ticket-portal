@@ -4,14 +4,18 @@ pipeline {
         nodejs "nodejs"
     }
     stages {
-        stage('Build') {
+        stage('Client - Build') {
             steps {
-                sh 'cd client && npm install'
+                dir('client') {
+                    sh 'npm install'
+                }
             }
         }
-        stage('Test') {
+        stage('Client - Test') {
             steps {
-                echo 'Testing..'
+                dir('client') {
+                    sh 'npm test'
+                }            
             }
         }
         stage('Deploy') {
