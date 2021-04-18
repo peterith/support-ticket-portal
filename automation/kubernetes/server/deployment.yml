@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-ticket-portal-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: peterith/support-ticket-portal-server:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: mysecret
+          env:
+            - name: STP_MYSQL_URL
+              value: "jdbc:mysql://20210418194535431300000001.cfwdf8e0obmi.eu-west-1.rds.amazonaws.com:3306/stp_prod"
+            - name: STP_JWT_SECRET
+              value: "QHnOP9B7qWtYWPKs7rOEdyqqooTF1PSVvcymm41fVqSet2HUY6ysbUT8QilqKqCVozzu0jHbCTCFVVEfG/sQGw=="
+            - name: STP_CORS_ORIGIN
+              value: http://aae878269a58e4f708caff19f44c81d9-372205368.eu-west-1.elb.amazonaws.com
