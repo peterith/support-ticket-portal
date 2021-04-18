@@ -7,6 +7,13 @@ pipeline {
         nodejs 'nodejs'
     }
     stages {
+        stage('Server - Clean') {
+            steps {
+                dir('server') {
+                    sh './mvnw clean compile'
+                }
+            }
+        }
         stage('Client - Build') {
             steps {
                 dir('client') {
@@ -26,8 +33,7 @@ pipeline {
                 dir('client') {
                     script {
                         docker.withRegistry('https://registry.hub.docker.com', 'docker-credentials') {
-                            def clientApp = docker.build 'peterith/support-ticket-portal-client:latest'
-                            clientApp.push()
+                            docker.build('peterith/support-ticket-portal-client').push('latest')
                         }   
                     }
                 }     
