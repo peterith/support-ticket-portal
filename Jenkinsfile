@@ -21,9 +21,14 @@ pipeline {
                 }            
             }
         }
-        stage('Deploy') {
+        stage('Client - Deploy') {
             steps {
-                echo 'Deploying....'
+                dir('client') {
+                    script {
+                        def clientApp = docker.build 'peterith/support-ticket-portal-client:latest'
+                        clientApp.push()
+                    }
+                }     
             }
         }
     }
