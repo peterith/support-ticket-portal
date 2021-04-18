@@ -26,7 +26,9 @@ pipeline {
                 dir('server') {
                     sh './mvnw package -Dmaven.test.skip=true'
                     script {
-                        docker.build('peterith/support-ticket-portal-server').push('latest')
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                            docker.build('peterith/support-ticket-portal-server').push('latest')
+                        }
                     }
                 }
             }
@@ -49,7 +51,9 @@ pipeline {
             steps {
                 dir('client') {
                     script {
-                        docker.build('peterith/support-ticket-portal-client').push('latest')
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                            docker.build('peterith/support-ticket-portal-client').push('latest')
+                        }
                     }
                 }     
             }
