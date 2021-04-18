@@ -7,10 +7,27 @@ pipeline {
         nodejs 'nodejs'
     }
     stages {
-        stage('Server - Clean') {
+        stage('Server - Build') {
             steps {
                 dir('server') {
                     sh './mvnw clean compile'
+                }
+            }
+        }
+        stage('Server - Test') {
+            steps {
+                dir('server') {
+                    sh './mvnw test'
+                }
+            }
+        }
+        stage('Server - Deploy') {
+            steps {
+                dir('server') {
+                    sh './mvnw package'
+                    script {
+                        docker.build('peterith/support-ticket-portal-server').push('latest')
+                    }
                 }
             }
         }
