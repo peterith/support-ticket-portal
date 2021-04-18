@@ -4,7 +4,7 @@ pipeline {
         CI = 'true'
     }
     tools {
-        nodejs "nodejs"
+        nodejs 'nodejs'
     }
     stages {
         stage('Client - Build') {
@@ -25,8 +25,10 @@ pipeline {
             steps {
                 dir('client') {
                     script {
-                        def clientApp = docker.build 'peterith/support-ticket-portal-client:latest'
-                        clientApp.push()
+                        docker.withRegistry('https://registry.hub.docker.com', 'docker-credentials') {
+                            def clientApp = docker.build 'peterith/support-ticket-portal-client:latest'
+                            clientApp.push()
+                        }   
                     }
                 }     
             }
