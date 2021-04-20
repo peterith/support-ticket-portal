@@ -91,7 +91,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnOkWhenCreateTicket() throws Exception {
         CreateTicketInput input = CreateTicketInput.builder()
                 .title("Ticket 2")
@@ -116,7 +116,36 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    void shouldReturnUnauthorizedWhenCreateTicketAndUnauthorized() throws Exception {
+        CreateTicketInput input = CreateTicketInput.builder()
+                .title("Ticket 2")
+                .description("Description 2")
+                .category(Category.FEATURE_REQUEST)
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(post("/tickets").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenCreateTicketAndForbidden() throws Exception {
+        CreateTicketInput input = CreateTicketInput.builder()
+                .title("Ticket 2")
+                .description("Description 2")
+                .category(Category.FEATURE_REQUEST)
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(post("/tickets").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnUnprocessableEntityWhenCreateTicketAndFailTitleValidation() throws Exception {
         CreateTicketInput input = CreateTicketInput.builder()
                 .title(" ".repeat(101))
@@ -131,7 +160,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnUnprocessableEntityWhenCreateTicketAndFailDescriptionValidation() throws Exception {
         CreateTicketInput input = CreateTicketInput.builder()
                 .title("Ticket 2")
@@ -146,7 +175,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("unknown")
+    @WithMockUser(username = "unknown", roles = {"CLIENT"})
     void shouldReturnUnprocessableEntityWhenCreateTicketAndFailAuthorValidation() throws Exception {
         CreateTicketInput input = CreateTicketInput.builder()
                 .title("Ticket 2")
@@ -161,13 +190,42 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnOkWhenDeleteTicket() throws Exception {
-        mockMvc.perform(delete("/tickets/" + ticket.getId())).andExpect(status().isOk());
+        mockMvc.perform(delete("/tickets/" + ticket.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("id").value(ticket.getId()))
+                .andExpect(jsonPath("title").value(ticket.getTitle()))
+                .andExpect(jsonPath("description").value(ticket.getDescription()))
+                .andExpect(jsonPath("status").value(ticket.getStatus().name()))
+                .andExpect(jsonPath("category").value(ticket.getCategory().name()))
+                .andExpect(jsonPath("priority").value(ticket.getPriority().name()))
+                .andExpect(jsonPath("author").value(ticket.getAuthor().getUsername()))
+                .andExpect(jsonPath("agent").value(ticket.getAgent().getUsername()))
+                .andExpect(jsonPath("createdAt").isString())
+                .andExpect(jsonPath("updatedAt").isString());
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    void shouldReturnUnauthorizedWhenDeleteTicketAndUnauthorized() throws Exception {
+        mockMvc.perform(delete("/tickets/0" + ticket.getId())).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
+    void shouldReturnNotFoundWhenDeleteTicketAndNoTicket() throws Exception {
+        mockMvc.perform(delete("/tickets/0")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenDeleteTicketAndForbidden() throws Exception {
+        mockMvc.perform(delete("/tickets/" + ticket.getId())).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnOkWhenUpdateTicket() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
@@ -198,7 +256,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnNotFoundWhenUpdateTicketAndNoTicket() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
@@ -216,7 +274,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnUnprocessableEntityWhenUpdateTicketAndFailTitleValidation() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title(" ".repeat(101))
@@ -236,7 +294,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("noobMaster")
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnUnprocessableEntityWhenUpdateTicketAndFailDescriptionValidation() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
@@ -256,7 +314,7 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser("unknown")
+    @WithMockUser(username = "unknown", roles = {"CLIENT"})
     void shouldReturnUnprocessableEntityWhenUpdateTicketAndFailAuthorValidation() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
