@@ -14,9 +14,9 @@ public interface TicketService {
 
     Optional<TicketDTO> findById(Long id);
 
-    TicketDTO create(CreateTicketInput input, String username) throws AuthorNotFoundException;
+    TicketDTO create(CreateTicketInput input, String username);
 
-    void deleteById(Long id);
+    TicketDTO deleteById(Long id, String username);
 
-    TicketDTO updateById(Long id, UpdateTicketInput input) throws AgentNotFoundException;
+    TicketDTO updateById(Long id, UpdateTicketInput input);
 }

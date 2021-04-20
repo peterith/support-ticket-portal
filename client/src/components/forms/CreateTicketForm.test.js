@@ -24,7 +24,7 @@ describe("Create Ticket Form", () => {
     });
   });
 
-  it("should alert when onSubmit throws error", () => {
+  it("should render alert when submit form and get error", () => {
     const mockFn = jest.fn(() => {
       throw new Error("Network error");
     });

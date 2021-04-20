@@ -206,7 +206,7 @@ describe("App", () => {
     expect(signInButton).toBeInTheDocument();
   });
 
-  it("should render network error when server is down", async () => {
+  it("should render alert when get network error", async () => {
     server.use(
       rest.get(
         `${process.env.REACT_APP_SERVER_URL}/tickets`,

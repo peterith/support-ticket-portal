@@ -1,4 +1,4 @@
 package com.peterith.supportticketportalserver.exception;
 
-public class AgentNotFoundException extends Exception {
+public class AgentNotFoundException extends RuntimeException {
 }

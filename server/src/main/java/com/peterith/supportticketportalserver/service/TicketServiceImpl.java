@@ -5,6 +5,7 @@ import com.peterith.supportticketportalserver.dto.TicketDTO;
 import com.peterith.supportticketportalserver.dto.UpdateTicketInput;
 import com.peterith.supportticketportalserver.exception.AgentNotFoundException;
 import com.peterith.supportticketportalserver.exception.AuthorNotFoundException;
+import com.peterith.supportticketportalserver.exception.ForbiddenException;
 import com.peterith.supportticketportalserver.model.Ticket;
 import com.peterith.supportticketportalserver.model.User;
 import com.peterith.supportticketportalserver.repository.TicketRepository;
@@ -40,7 +41,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDTO create(CreateTicketInput input, String username) throws AuthorNotFoundException {
+    public TicketDTO create(CreateTicketInput input, String username) {
         Optional<User> optionalAuthor = userRepository.findByUsername(username);
 
         return optionalAuthor.map(author -> {
@@ -50,12 +51,20 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        ticketRepository.deleteById(id);
+    public TicketDTO deleteById(Long id, String username) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+        Ticket ticket = optionalTicket.orElseThrow();
+
+        if (!ticket.getAuthor().getUsername().equals(username)) {
+            throw new ForbiddenException();
+        }
+
+        ticketRepository.delete(ticket);
+        return ticket.toDTO();
     }
 
     @Override
-    public TicketDTO updateById(Long id, UpdateTicketInput input) throws AgentNotFoundException {
+    public TicketDTO updateById(Long id, UpdateTicketInput input) {
         try {
             Optional<Ticket> optionalTicket = ticketRepository.findById(id);
             Ticket ticket = optionalTicket.orElseThrow();

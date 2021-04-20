@@ -5,12 +5,12 @@ import com.peterith.supportticketportalserver.dto.TicketDTO;
 import com.peterith.supportticketportalserver.dto.UpdateTicketInput;
 import com.peterith.supportticketportalserver.exception.AgentNotFoundException;
 import com.peterith.supportticketportalserver.exception.AuthorNotFoundException;
-import com.peterith.supportticketportalserver.security.MyUserDetails;
+import com.peterith.supportticketportalserver.exception.ForbiddenException;
 import com.peterith.supportticketportalserver.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
@@ -53,8 +53,15 @@ public class TicketController {
 
     @DeleteMapping("/tickets/{id}")
     public ResponseEntity deleteTicket(@PathVariable Long id) {
-        ticketService.deleteById(id);
-        return ResponseEntity.ok().build();
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            TicketDTO dto = ticketService.deleteById(id, username);
+            return ResponseEntity.ok(dto);
+        } catch (NoSuchElementException nsee) {
+            return ResponseEntity.notFound().build();
+        } catch (ForbiddenException ue) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PutMapping("/tickets/{id}")

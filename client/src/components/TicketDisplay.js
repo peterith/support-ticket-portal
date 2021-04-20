@@ -225,7 +225,7 @@ const TicketDisplay = ({
           {new Date(ticket.updatedAt).toLocaleString()}
         </span>
       </div>
-      {user && (
+      {user && user.username === ticket.author && (
         <button
           type="button"
           onClick={openModal(ModalTypeEnum.CONFIRMATION, {

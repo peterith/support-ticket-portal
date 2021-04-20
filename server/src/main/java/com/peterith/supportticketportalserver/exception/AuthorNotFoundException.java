@@ -1,4 +1,4 @@
 package com.peterith.supportticketportalserver.exception;
 
-public class AuthorNotFoundException extends Exception{
+public class AuthorNotFoundException extends RuntimeException {
 }

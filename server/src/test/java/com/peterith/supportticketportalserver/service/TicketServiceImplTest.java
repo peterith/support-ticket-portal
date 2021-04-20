@@ -5,6 +5,7 @@ import com.peterith.supportticketportalserver.dto.TicketDTO;
 import com.peterith.supportticketportalserver.dto.UpdateTicketInput;
 import com.peterith.supportticketportalserver.exception.AgentNotFoundException;
 import com.peterith.supportticketportalserver.exception.AuthorNotFoundException;
+import com.peterith.supportticketportalserver.exception.ForbiddenException;
 import com.peterith.supportticketportalserver.model.*;
 import com.peterith.supportticketportalserver.repository.TicketRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -162,10 +163,30 @@ class TicketServiceImplTest {
 
     @Test
     void shouldDeleteTicketWhenDeleteById() {
-        ticketService.deleteById(ticket.getId());
-        List<Ticket> actual = ticketRepository.findAll();
+        TicketDTO actual1 = ticketService.deleteById(ticket.getId(), ticket.getAuthor().getUsername());
+        assertThat(actual1.getTitle(), is(ticket.getTitle()));
+        assertThat(actual1.getDescription(), is(ticket.getDescription()));
+        assertThat(actual1.getStatus(), is(ticket.getStatus()));
+        assertThat(actual1.getCategory(), is(ticket.getCategory()));
+        assertThat(actual1.getPriority(), is(ticket.getPriority()));
+        assertThat(actual1.getAuthor(), is(ticket.getAuthor().getUsername()));
+        assertThat(actual1.getAgent(), is(ticket.getAgent().getUsername()));
+        assertThat(actual1.getCreatedAt(), is(ticket.getCreatedAt()));
+        assertThat(actual1.getUpdatedAt(), is(ticket.getUpdatedAt()));
+
+        List<Ticket> actual2 = ticketRepository.findAll();
         List<Ticket> expected = List.of();
-        assertThat(actual, is(expected));
+        assertThat(actual2, is(expected));
+    }
+
+    @Test
+    void shouldThrowWhenDeleteByIdAndNoTicket() {
+        assertThrows(NoSuchElementException.class, () -> ticketService.deleteById(0L, agent.getUsername()));
+    }
+
+    @Test
+    void shouldThrowWhenDeleteByIdAndUnauthorized() {
+        assertThrows(ForbiddenException.class, () -> ticketService.deleteById(ticket.getId(), agent.getUsername()));
     }
 
     @Test

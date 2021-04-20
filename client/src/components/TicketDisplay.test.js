@@ -75,7 +75,7 @@ describe("Ticket Display", () => {
     expect(modifiedField).toBeInTheDocument();
   });
 
-  it("should not render update and delete components when user signed in", () => {
+  it("should not render update and delete components when no user signed in", () => {
     render(
       <AuthProvider>
         <ModalProvider>
@@ -110,7 +110,7 @@ describe("Ticket Display", () => {
     expect(deleteButton).not.toBeInTheDocument();
   });
 
-  it("should render update and delete components when user signed in", () => {
+  it("should render update and delete components when user is author", () => {
     const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     render(
       <AuthProvider initialUser={initialUser}>
@@ -142,8 +142,30 @@ describe("Ticket Display", () => {
     const priorityButton = screen.getByRole("button", { name: "Priority" });
     expect(priorityButton).toBeInTheDocument();
 
-    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    const deleteButton = screen.getByRole("button", { name: "delete" });
     expect(deleteButton).toBeInTheDocument();
+  });
+
+  it("should not render delete button when user is not author", () => {
+    const initialUser = { username: "newbie", role: RoleEnum.CLIENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it("should call onClose when close display", () => {
@@ -239,6 +261,44 @@ describe("Ticket Display", () => {
     expect(mockFn).toHaveBeenCalledWith("New Description 1");
   });
 
+  it("should render alert when update description and get error", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={mockFn}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const descriptionButton = screen.getByRole("button", {
+      name: "Description",
+    });
+    fireEvent.click(descriptionButton);
+
+    const descriptionField = screen.getByRole("textbox", {
+      name: "Description",
+    });
+    fireEvent.change(descriptionField, {
+      target: { value: "New Description 1" },
+    });
+    fireEvent.blur(descriptionField);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
+  });
+
   it("should call onUpdateStatus when update status", async () => {
     const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
@@ -267,6 +327,38 @@ describe("Ticket Display", () => {
 
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn).toHaveBeenCalledWith(StatusEnum.RESOLVED);
+  });
+
+  it("should render alert when update status and get error", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={mockFn}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const statusButton = screen.getByRole("button", { name: "Status" });
+    fireEvent.click(statusButton);
+
+    const statuses = screen.getByRole("listbox", { name: "Status" });
+    const resolvedStatus = within(statuses).getByText("Resolved");
+    fireEvent.click(resolvedStatus);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
   });
 
   it("should call onUpdateCategory when update category", async () => {
@@ -301,6 +393,40 @@ describe("Ticket Display", () => {
     expect(mockFn).toHaveBeenCalledWith(CategoryEnum.TECHNICAL_ISSUE);
   });
 
+  it("should render alert when update category and get error", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={mockFn}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const categoryButton = screen.getByRole("button", { name: "Category" });
+    fireEvent.click(categoryButton);
+
+    const categories = screen.getByRole("listbox", { name: "Category" });
+    const technicalIssueCategory = within(categories).getByText(
+      "Technical Issue"
+    );
+    fireEvent.click(technicalIssueCategory);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
+  });
+
   it("should call onUpdatePriority when update priority", async () => {
     const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
@@ -329,5 +455,37 @@ describe("Ticket Display", () => {
 
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn).toHaveBeenCalledWith(PriorityEnum.HIGH);
+  });
+
+  it("should render alert when update priority and get error", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={mockFn}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const priorityButton = screen.getByRole("button", { name: "Priority" });
+    fireEvent.click(priorityButton);
+
+    const categories = screen.getByRole("listbox", { name: "Priority" });
+    const highPriority = within(categories).getByText("High");
+    fireEvent.click(highPriority);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
   });
 });
