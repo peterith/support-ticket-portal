@@ -26,7 +26,8 @@ class MyUserDetailsServiceTest {
 
         assertThat(userDetails.getUsername(), is("noobMaster"));
         assertThat(userDetails.getPassword(), is("{noop}password"));
-        assertThat(userDetails.getAuthorities(), is(List.of(new SimpleGrantedAuthority(Role.CLIENT.name()))));
+        assertThat(userDetails.getAuthorities(),
+                is(List.of(new SimpleGrantedAuthority("ROLE_" + Role.CLIENT.name()))));
     }
 
     @Test

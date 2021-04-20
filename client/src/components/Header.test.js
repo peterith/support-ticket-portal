@@ -158,7 +158,32 @@ describe("Header", () => {
     expect(createTicketForm).not.toBeInTheDocument();
   });
 
-  it("should call onCreate when create ticket and user signed in", async () => {
+  it("should disable Create button when user is agent", async () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    const mockFn = jest.fn();
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <Header
+            onSignIn={jest.fn()}
+            onSignOut={jest.fn()}
+            onCreateTicket={mockFn}
+          />
+        </ModalProvider>
+      </AuthProvider>,
+      { container: document.body.appendChild(container).firstChild }
+    );
+
+    const createButton = screen.getByRole("button", { name: "Create" });
+    fireEvent.click(createButton);
+
+    const createTicketForm = screen.queryByRole("dialog", {
+      name: "Create Ticket",
+    });
+    expect(createTicketForm).not.toBeInTheDocument();
+  });
+
+  it("should call onCreate when create ticket", async () => {
     const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     const mockFn = jest.fn();
     render(
