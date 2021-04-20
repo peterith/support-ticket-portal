@@ -2,7 +2,7 @@
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 import { useAuth, useModal } from "../hooks";
-import { ModalTypeEnum } from "../enums";
+import { ModalTypeEnum, RoleEnum } from "../enums";
 
 const Header = ({ onSignIn, onSignOut, onCreateTicket }) => {
   const { user } = useAuth();
@@ -76,8 +76,12 @@ const Header = ({ onSignIn, onSignOut, onCreateTicket }) => {
         onClick={openModal(ModalTypeEnum.CREATE_TICKET_FORM, {
           onSubmit: onCreateTicket,
         })}
-        disabled={!user}
-        css={[buttonStyle, createButtonStyle, !user && disabledButtonStyle]}
+        disabled={!user || user.role === RoleEnum.AGENT}
+        css={[
+          buttonStyle,
+          createButtonStyle,
+          (!user || user.role === RoleEnum.AGENT) && disabledButtonStyle,
+        ]}
       >
         Create
       </button>

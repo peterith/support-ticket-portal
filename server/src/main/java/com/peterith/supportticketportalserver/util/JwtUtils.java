@@ -21,11 +21,12 @@ public class JwtUtils {
 
     public String generateJWS(UserDetails userDetails) {
         SimpleGrantedAuthority authority = (SimpleGrantedAuthority) userDetails.getAuthorities().toArray()[0];
+        String role = authority.getAuthority().substring(5);
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setExpiration(Date.from(Instant.now().plus(Duration.ofDays(7))))
                 .setIssuedAt(Date.from(Instant.now()))
-                .claim("role", authority.getAuthority())
+                .claim("role", role)
                 .signWith(getSecretKey())
                 .compact();
     }
