@@ -10,6 +10,7 @@ import com.peterith.supportticketportalserver.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class TicketController {
     @PostMapping("/tickets")
     public ResponseEntity createTicket(@RequestBody CreateTicketInput input) {
         try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            String username = getContextAuthentication().getName();
             TicketDTO dto = ticketService.create(input, username);
             return ResponseEntity.ok(dto);
         } catch (ConstraintViolationException cve) {
@@ -54,7 +55,7 @@ public class TicketController {
     @DeleteMapping("/tickets/{id}")
     public ResponseEntity deleteTicket(@PathVariable Long id) {
         try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            String username = getContextAuthentication().getName();
             TicketDTO dto = ticketService.deleteById(id, username);
             return ResponseEntity.ok(dto);
         } catch (NoSuchElementException nsee) {
@@ -67,7 +68,8 @@ public class TicketController {
     @PutMapping("/tickets/{id}")
     public ResponseEntity updateTicket(@PathVariable Long id, @RequestBody UpdateTicketInput input) {
         try {
-            TicketDTO dto = ticketService.updateById(id, input);
+            Authentication authentication = getContextAuthentication();
+            TicketDTO dto = ticketService.updateById(id, input, authentication);
             return ResponseEntity.ok(dto);
         } catch (NoSuchElementException nsee) {
             return ResponseEntity.notFound().build();
@@ -76,7 +78,13 @@ public class TicketController {
             return ResponseEntity.unprocessableEntity().body(constraintViolations);
         } catch (AgentNotFoundException anfe) {
             return ResponseEntity.unprocessableEntity().body("agent: unknown username");
+        } catch (ForbiddenException fe) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+    }
+
+    private Authentication getContextAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     private String getConstraintViolations(ConstraintViolationException cve) {

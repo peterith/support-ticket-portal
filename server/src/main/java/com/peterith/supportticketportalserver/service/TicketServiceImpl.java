@@ -6,11 +6,15 @@ import com.peterith.supportticketportalserver.dto.UpdateTicketInput;
 import com.peterith.supportticketportalserver.exception.AgentNotFoundException;
 import com.peterith.supportticketportalserver.exception.AuthorNotFoundException;
 import com.peterith.supportticketportalserver.exception.ForbiddenException;
+import com.peterith.supportticketportalserver.model.Role;
+import com.peterith.supportticketportalserver.model.Status;
 import com.peterith.supportticketportalserver.model.Ticket;
 import com.peterith.supportticketportalserver.model.User;
 import com.peterith.supportticketportalserver.repository.TicketRepository;
 import com.peterith.supportticketportalserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 
@@ -64,10 +68,14 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDTO updateById(Long id, UpdateTicketInput input) {
+    public TicketDTO updateById(Long id, UpdateTicketInput input, Authentication authentication) {
         try {
             Optional<Ticket> optionalTicket = ticketRepository.findById(id);
             Ticket ticket = optionalTicket.orElseThrow();
+
+            if (isForbiddenStatus(input.getStatus(), authentication)) {
+                throw new ForbiddenException();
+            }
 
             if (input.getAgent() == null) {
                 ticket.update(input);
@@ -82,6 +90,24 @@ public class TicketServiceImpl implements TicketService {
             return throwTransactionRootCause(e);
         }
     }
+
+    private boolean isForbiddenStatus(Status status, Authentication authentication) {
+        return (authenticationHasRole(authentication, Role.CLIENT) && isForbiddenStatusForClient(status)) ||
+                authenticationHasRole(authentication, Role.AGENT) && isForbiddenStatusForAgent(status);
+    }
+
+    private boolean authenticationHasRole(Authentication authentication, Role role) {
+        return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_" + role));
+    }
+
+    private boolean isForbiddenStatusForClient(Status status) {
+        return status == Status.IN_PROGRESS || status == Status.RESOLVED;
+    }
+
+    private boolean isForbiddenStatusForAgent(Status status) {
+        return status == Status.CLOSED;
+    }
+
 
     private <T> T throwTransactionRootCause(TransactionSystemException e) {
         Throwable rootCause = e.getRootCause();

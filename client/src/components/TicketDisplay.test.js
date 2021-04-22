@@ -168,6 +168,78 @@ describe("Ticket Display", () => {
     expect(deleteButton).not.toBeInTheDocument();
   });
 
+  it("should render only Open and Closed status options when user is client", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const statusButton = screen.getByRole("button", { name: "Status" });
+    fireEvent.click(statusButton);
+
+    const statuses = screen.getByRole("listbox", { name: "Status" });
+
+    const openStatus = within(statuses).getByText("Open");
+    expect(openStatus).toBeInTheDocument();
+
+    const inProgressStatus = within(statuses).queryByText("In Progress");
+    expect(inProgressStatus).not.toBeInTheDocument();
+
+    const resolvedStatus = within(statuses).queryByText("Resolved");
+    expect(resolvedStatus).not.toBeInTheDocument();
+
+    const closedStatus = within(statuses).getByText("Closed");
+    expect(closedStatus).toBeInTheDocument();
+  });
+
+  it("should render only Open , In Progress, and Closed status options when user is agent", async () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const statusButton = screen.getByRole("button", { name: "Status" });
+    fireEvent.click(statusButton);
+
+    const statuses = screen.getByRole("listbox", { name: "Status" });
+
+    const openStatus = within(statuses).getByText("Open");
+    expect(openStatus).toBeInTheDocument();
+
+    const inProgressStatus = within(statuses).getByText("In Progress");
+    expect(inProgressStatus).toBeInTheDocument();
+
+    const resolvedStatus = within(statuses).getByText("Resolved");
+    expect(resolvedStatus).toBeInTheDocument();
+
+    const closedStatus = within(statuses).queryByText("Closed");
+    expect(closedStatus).not.toBeInTheDocument();
+  });
+
   it("should call onClose when close display", () => {
     const mockFn = jest.fn();
     render(
@@ -322,11 +394,11 @@ describe("Ticket Display", () => {
     fireEvent.click(statusButton);
 
     const statuses = screen.getByRole("listbox", { name: "Status" });
-    const resolvedStatus = within(statuses).getByText("Resolved");
-    fireEvent.click(resolvedStatus);
+    const closedStatus = within(statuses).getByText("Closed");
+    fireEvent.click(closedStatus);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
-    expect(mockFn).toHaveBeenCalledWith(StatusEnum.RESOLVED);
+    expect(mockFn).toHaveBeenCalledWith(StatusEnum.CLOSED);
   });
 
   it("should render alert when update status and get error", async () => {
@@ -354,8 +426,8 @@ describe("Ticket Display", () => {
     fireEvent.click(statusButton);
 
     const statuses = screen.getByRole("listbox", { name: "Status" });
-    const resolvedStatus = within(statuses).getByText("Resolved");
-    fireEvent.click(resolvedStatus);
+    const closedStatus = within(statuses).getByText("Closed");
+    fireEvent.click(closedStatus);
 
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Network error");
