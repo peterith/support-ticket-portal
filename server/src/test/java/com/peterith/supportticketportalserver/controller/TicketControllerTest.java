@@ -28,7 +28,7 @@ class TicketControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    User author = User.builder().id(1L).username("noobMaster").password("{noop}password").role(Role.CLIENT).build();
+    User client = User.builder().id(1L).username("noobMaster").password("{noop}password").role(Role.CLIENT).build();
     User agent = User.builder().id(2L).username("agent007").password("{noop}password").role(Role.AGENT).build();
 
     Ticket ticket = Ticket.builder()
@@ -37,7 +37,7 @@ class TicketControllerTest {
             .status(Status.OPEN)
             .category(Category.BUG)
             .priority(Priority.MEDIUM)
-            .author(author)
+            .author(client)
             .agent(agent)
             .build();
 
@@ -110,7 +110,7 @@ class TicketControllerTest {
                 .andExpect(jsonPath("status").value(Status.OPEN.name()))
                 .andExpect(jsonPath("category").value(input.getCategory().name()))
                 .andExpect(jsonPath("priority").value(Priority.MEDIUM.name()))
-                .andExpect(jsonPath("author").value(author.getUsername()))
+                .andExpect(jsonPath("author").value(client.getUsername()))
                 .andExpect(jsonPath("createdAt").isString())
                 .andExpect(jsonPath("updatedAt").isString());
     }
@@ -230,7 +230,7 @@ class TicketControllerTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
@@ -256,12 +256,31 @@ class TicketControllerTest {
     }
 
     @Test
+    void shouldReturnUnauthorizedWhenUpdateTicketAndUnauthorized() throws Exception {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
+                .status(Status.CLOSED)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("agent007")
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(put("/tickets/" + ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
     void shouldReturnNotFoundWhenUpdateTicketAndNoTicket() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
@@ -279,7 +298,7 @@ class TicketControllerTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title(" ".repeat(101))
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
@@ -299,7 +318,7 @@ class TicketControllerTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description(" ".repeat(1001))
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
@@ -314,12 +333,12 @@ class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "unknown", roles = {"CLIENT"})
-    void shouldReturnUnprocessableEntityWhenUpdateTicketAndFailAuthorValidation() throws Exception {
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
+    void shouldReturnUnprocessableEntityWhenUpdateTicketAndFailAgentValidation() throws Exception {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("unknown")
@@ -331,5 +350,61 @@ class TicketControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @WithMockUser(username = "noobMaster", roles = {"CLIENT"})
+    void shouldReturnForbiddenWhenUpdateTicketAndForbiddenStatusForClient() throws Exception {
+        UpdateTicketInput input1 = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
+                .status(Status.IN_PROGRESS)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("unknown")
+                .build();
+
+        String content1 = toJSONString(input1);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content1))
+                .andExpect(status().isForbidden());
+
+        UpdateTicketInput input2 = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
+                .status(Status.RESOLVED)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("unknown")
+                .build();
+
+        String content2 = toJSONString(input2);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content2))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenUpdateTicketAndForbiddenStatusForAgent() throws Exception {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
+                .status(Status.CLOSED)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("unknown")
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isForbidden());
     }
 }

@@ -13,6 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -34,8 +38,16 @@ class TicketServiceImplTest {
     @Autowired
     TicketService ticketService;
 
-    User author = User.builder().id(1L).username("noobMaster").password("{noop}password").role(Role.CLIENT).build();
+    User client = User.builder().id(1L).username("noobMaster").password("{noop}password").role(Role.CLIENT).build();
     User agent = User.builder().id(2L).username("agent007").password("{noop}password").role(Role.AGENT).build();
+
+    GrantedAuthority clientRole = new SimpleGrantedAuthority("ROLE_" + Role.CLIENT);
+    GrantedAuthority agentRole = new SimpleGrantedAuthority("ROLE_" + Role.AGENT);
+
+    Authentication clientAuthentication =
+            new UsernamePasswordAuthenticationToken(client.getUsername(), null, List.of(clientRole));
+    Authentication agentAuthentication =
+            new UsernamePasswordAuthenticationToken(agent.getUsername(), null, List.of(agentRole));
 
     Ticket ticket = Ticket.builder()
             .title("Ticket 1")
@@ -43,7 +55,7 @@ class TicketServiceImplTest {
             .status(Status.OPEN)
             .category(Category.BUG)
             .priority(Priority.MEDIUM)
-            .author(author)
+            .author(client)
             .agent(agent)
             .build();
 
@@ -105,13 +117,13 @@ class TicketServiceImplTest {
                 .category(Category.FEATURE_REQUEST)
                 .build();
 
-        TicketDTO actual1 = ticketService.create(input, author.getUsername());
+        TicketDTO actual1 = ticketService.create(input, client.getUsername());
         assertThat(actual1.getTitle(), is(input.getTitle()));
         assertThat(actual1.getDescription(), is(input.getDescription()));
         assertThat(actual1.getStatus(), is(Status.OPEN));
         assertThat(actual1.getCategory(), is(input.getCategory()));
         assertThat(actual1.getPriority(), is(Priority.MEDIUM));
-        assertThat(actual1.getAuthor(), is(author.getUsername()));
+        assertThat(actual1.getAuthor(), is(client.getUsername()));
         assertThat(actual1.getAgent(), is(nullValue()));
         assertThat(actual1.getCreatedAt(), isA(LocalDateTime.class));
         assertThat(actual1.getUpdatedAt(), isA(LocalDateTime.class));
@@ -122,7 +134,7 @@ class TicketServiceImplTest {
         assertThat(actual2.get().getStatus(), is(Status.OPEN));
         assertThat(actual2.get().getCategory(), is(input.getCategory()));
         assertThat(actual2.get().getPriority(), is(Priority.MEDIUM));
-        assertThat(actual2.get().getAuthor(), is(author));
+        assertThat(actual2.get().getAuthor(), is(client));
         assertThat(actual2.get().getAgent(), is(nullValue()));
         assertThat(actual2.get().getCreatedAt(), isA(LocalDateTime.class));
         assertThat(actual2.get().getUpdatedAt(), isA(LocalDateTime.class));
@@ -136,7 +148,7 @@ class TicketServiceImplTest {
                 .category(Category.FEATURE_REQUEST)
                 .build();
 
-        assertThrows(ConstraintViolationException.class, () -> ticketService.create(input, author.getUsername()));
+        assertThrows(ConstraintViolationException.class, () -> ticketService.create(input, client.getUsername()));
     }
 
     @Test
@@ -147,7 +159,7 @@ class TicketServiceImplTest {
                 .category(Category.FEATURE_REQUEST)
                 .build();
 
-        assertThrows(ConstraintViolationException.class, () -> ticketService.create(input, author.getUsername()));
+        assertThrows(ConstraintViolationException.class, () -> ticketService.create(input, client.getUsername()));
     }
 
     @Test
@@ -194,13 +206,13 @@ class TicketServiceImplTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
                 .build();
 
-        TicketDTO actual1 = ticketService.updateById(ticket.getId(), input);
+        TicketDTO actual1 = ticketService.updateById(ticket.getId(), input, clientAuthentication);
         assertThat(actual1.getTitle(), is(input.getTitle()));
         assertThat(actual1.getDescription(), is(input.getDescription()));
         assertThat(actual1.getStatus(), is(input.getStatus()));
@@ -217,7 +229,7 @@ class TicketServiceImplTest {
         assertThat(actual2.get().getStatus(), is(input.getStatus()));
         assertThat(actual2.get().getCategory(), is(input.getCategory()));
         assertThat(actual2.get().getPriority(), is(input.getPriority()));
-        assertThat(actual2.get().getAuthor(), is(author));
+        assertThat(actual2.get().getAuthor(), is(client));
         assertThat(actual2.get().getAgent(), is(agent));
         assertThat(actual2.get().getCreatedAt(), is(ticket.getCreatedAt()));
         assertThat(actual2.get().getUpdatedAt(), isA(LocalDateTime.class));
@@ -228,13 +240,13 @@ class TicketServiceImplTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
                 .build();
 
-        assertThrows(NoSuchElementException.class, () -> ticketService.updateById(0L, input));
+        assertThrows(NoSuchElementException.class, () -> ticketService.updateById(0L, input, clientAuthentication));
     }
 
     @Test
@@ -242,13 +254,14 @@ class TicketServiceImplTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title(" ".repeat(101))
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.CLOSED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
                 .build();
 
-        assertThrows(ConstraintViolationException.class, () -> ticketService.updateById(ticket.getId(), input));
+        assertThrows(ConstraintViolationException.class,
+                () -> ticketService.updateById(ticket.getId(), input, clientAuthentication));
     }
 
     @Test
@@ -256,26 +269,67 @@ class TicketServiceImplTest {
         UpdateTicketInput input = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description(" ".repeat(1001))
+                .status(Status.CLOSED)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("agent007")
+                .build();
+
+        assertThrows(ConstraintViolationException.class,
+                () -> ticketService.updateById(ticket.getId(), input, clientAuthentication));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateByIdAndFailAgentValidation() {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
+                .status(Status.CLOSED)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("unknown")
+                .build();
+
+        assertThrows(AgentNotFoundException.class,
+                () -> ticketService.updateById(ticket.getId(), input, clientAuthentication));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateByIdAndFailStatusValidation() {
+        UpdateTicketInput input1 = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
                 .status(Status.IN_PROGRESS)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
                 .agent("agent007")
                 .build();
 
-        assertThrows(ConstraintViolationException.class, () -> ticketService.updateById(ticket.getId(), input));
-    }
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input1, clientAuthentication));
 
-    @Test
-    void shouldThrowWhenUpdateByIdAndFailAuthorValidation() {
-        UpdateTicketInput input = UpdateTicketInput.builder()
+        UpdateTicketInput input2 = UpdateTicketInput.builder()
                 .title("New Ticket 1")
                 .description("New Description 1")
-                .status(Status.IN_PROGRESS)
+                .status(Status.RESOLVED)
                 .category(Category.TECHNICAL_ISSUE)
                 .priority(Priority.HIGH)
-                .agent("unknown")
+                .agent("agent007")
                 .build();
 
-        assertThrows(AgentNotFoundException.class, () -> ticketService.updateById(ticket.getId(), input));
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input2, clientAuthentication));
+
+        UpdateTicketInput input3 = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("New Description 1")
+                .status(Status.CLOSED)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.HIGH)
+                .agent("agent007")
+                .build();
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input3, agentAuthentication));
     }
 }

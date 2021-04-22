@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
@@ -13,6 +13,7 @@ import {
   CategoryEnum,
   ModalTypeEnum,
   PriorityEnum,
+  RoleEnum,
   StatusEnum,
 } from "../enums";
 
@@ -33,6 +34,23 @@ const TicketDisplay = ({
   useEffect(() => {
     setErrorMessage(null);
   }, [ticket]);
+
+  const statusOptions = useMemo(() => {
+    if (user) {
+      return user.role === RoleEnum.CLIENT
+        ? [
+            { label: "Open", value: StatusEnum.OPEN },
+            { label: "Closed", value: StatusEnum.CLOSED },
+          ]
+        : [
+            { label: "Open", value: StatusEnum.OPEN },
+            { label: "In Progress", value: StatusEnum.IN_PROGRESS },
+            { label: "Resolved", value: StatusEnum.RESOLVED },
+          ];
+    }
+
+    return [];
+  }, [user]);
 
   const displayStyle = css`
     background-color: #222b41;
@@ -154,12 +172,7 @@ const TicketDisplay = ({
           <strong>Status</strong>
         </div>
         <EditableSelect
-          options={[
-            { label: "Open", value: StatusEnum.OPEN },
-            { label: "In Progress", value: StatusEnum.IN_PROGRESS },
-            { label: "Resolved", value: StatusEnum.RESOLVED },
-            { label: "Closed", value: StatusEnum.CLOSED },
-          ]}
+          options={statusOptions}
           onChange={handleUpdate(onUpdateStatus)}
           disabled={!user}
           ariaLabelledBy="ticket-status"
