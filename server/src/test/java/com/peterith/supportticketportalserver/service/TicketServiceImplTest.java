@@ -197,7 +197,7 @@ class TicketServiceImplTest {
     }
 
     @Test
-    void shouldThrowWhenDeleteByIdAndUnauthorized() {
+    void shouldThrowWhenDeleteByIdAndForbidden() {
         assertThrows(ForbiddenException.class, () -> ticketService.deleteById(ticket.getId(), agent.getUsername()));
     }
 
@@ -331,5 +331,61 @@ class TicketServiceImplTest {
 
         assertThrows(ForbiddenException.class,
                 () -> ticketService.updateById(ticket.getId(), input3, agentAuthentication));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateByIdAndUpdateTitleByNonAuthor() {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("Description 1")
+                .status(Status.OPEN)
+                .category(Category.BUG)
+                .priority(Priority.MEDIUM)
+                .build();
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input, agentAuthentication));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateByIdAndUpdateDescriptionByNonAuthor() {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("Ticket 1")
+                .description("New Description 1")
+                .status(Status.OPEN)
+                .category(Category.BUG)
+                .priority(Priority.MEDIUM)
+                .build();
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input, agentAuthentication));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateByIdAndUpdateCategoryByNonAuthor() {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("Ticket 1")
+                .description("Description 1")
+                .status(Status.OPEN)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.MEDIUM)
+                .build();
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input, agentAuthentication));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateByIdAndUpdatePriorityByNonAuthor() {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("Ticket 1")
+                .description("Description 1")
+                .status(Status.OPEN)
+                .category(Category.BUG)
+                .priority(Priority.HIGH)
+                .build();
+
+        assertThrows(ForbiddenException.class,
+                () -> ticketService.updateById(ticket.getId(), input, agentAuthentication));
     }
 }
