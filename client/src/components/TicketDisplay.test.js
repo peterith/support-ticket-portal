@@ -110,6 +110,42 @@ describe("Ticket Display", () => {
     expect(deleteButton).not.toBeInTheDocument();
   });
 
+  it("should not render Delete button and update buttons for description, category, and priority when user is not author", () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const descriptionButton = screen.queryByRole("button", {
+      name: "Description",
+    });
+    expect(descriptionButton).not.toBeInTheDocument();
+
+    const statusButton = screen.getByRole("button", { name: "Status" });
+    expect(statusButton).toBeInTheDocument();
+
+    const categoryButton = screen.queryByRole("button", { name: "Category" });
+    expect(categoryButton).not.toBeInTheDocument();
+
+    const priorityButton = screen.queryByRole("button", { name: "Priority" });
+    expect(priorityButton).not.toBeInTheDocument();
+
+    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    expect(deleteButton).not.toBeInTheDocument();
+  });
+
   it("should render update and delete components when user is author", () => {
     const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
     render(
@@ -204,7 +240,7 @@ describe("Ticket Display", () => {
     expect(closedStatus).toBeInTheDocument();
   });
 
-  it("should render only Open , In Progress, and Closed status options when user is agent", async () => {
+  it("should render only Open, In Progress, and Closed status options when user is agent", async () => {
     const initialUser = { username: "agent007", role: RoleEnum.AGENT };
     render(
       <AuthProvider initialUser={initialUser}>

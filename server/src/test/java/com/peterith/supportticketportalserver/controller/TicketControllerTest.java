@@ -407,4 +407,80 @@ class TicketControllerTest {
                 .content(content))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenUpdateTicketTitleByNonAuthor() throws Exception {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("New Ticket 1")
+                .description("Description 1")
+                .status(Status.OPEN)
+                .category(Category.BUG)
+                .priority(Priority.MEDIUM)
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenUpdateTicketDescriptionByNonAuthor() throws Exception {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("Ticket 1")
+                .description("New Description 1")
+                .status(Status.OPEN)
+                .category(Category.BUG)
+                .priority(Priority.MEDIUM)
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenUpdateTicketCategoryByNonAuthor() throws Exception {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("Ticket 1")
+                .description("Description 1")
+                .status(Status.OPEN)
+                .category(Category.TECHNICAL_ISSUE)
+                .priority(Priority.MEDIUM)
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "agent007", roles = {"AGENT"})
+    void shouldReturnForbiddenWhenUpdateTicketPriorityByNonAuthor() throws Exception {
+        UpdateTicketInput input = UpdateTicketInput.builder()
+                .title("Ticket 1")
+                .description("Description 1")
+                .status(Status.OPEN)
+                .category(Category.BUG)
+                .priority(Priority.HIGH)
+                .build();
+
+        String content = toJSONString(input);
+
+        mockMvc.perform(put("/tickets/" + this.ticket.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isForbidden());
+    }
 }

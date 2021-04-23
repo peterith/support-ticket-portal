@@ -156,7 +156,7 @@ const TicketDisplay = ({
       </h3>
       <EditableTextArea
         onBlur={handleUpdate(onUpdateDescription)}
-        disabled={!user}
+        disabled={!user || user.username !== ticket.author}
         ariaLabelledBy="ticket-description"
       >
         {ticket.description}
@@ -190,7 +190,7 @@ const TicketDisplay = ({
             { label: "Account", value: CategoryEnum.ACCOUNT },
           ]}
           onChange={handleUpdate(onUpdateCategory)}
-          disabled={!user}
+          disabled={!user || user.username !== ticket.author}
           ariaLabelledBy="ticket-category"
         >
           <CategoryPill category={ticket.category} css={categoryPillStyle} />
@@ -205,7 +205,7 @@ const TicketDisplay = ({
             { label: "High", value: PriorityEnum.HIGH },
           ]}
           onChange={handleUpdate(onUpdatePriority)}
-          disabled={!user}
+          disabled={!user || user.username !== ticket.author}
           ariaLabelledBy="ticket-priority"
         >
           <PriorityDisplay

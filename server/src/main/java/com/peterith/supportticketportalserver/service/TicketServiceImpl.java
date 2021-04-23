@@ -72,10 +72,7 @@ public class TicketServiceImpl implements TicketService {
         try {
             Optional<Ticket> optionalTicket = ticketRepository.findById(id);
             Ticket ticket = optionalTicket.orElseThrow();
-
-            if (isForbiddenStatus(input.getStatus(), authentication)) {
-                throw new ForbiddenException();
-            }
+            validateUpdatedTicket(ticket, input, authentication);
 
             if (input.getAgent() == null) {
                 ticket.update(input);
@@ -91,20 +88,36 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
-    private boolean isForbiddenStatus(Status status, Authentication authentication) {
-        return (authenticationHasRole(authentication, Role.CLIENT) && isForbiddenStatusForClient(status)) ||
-                authenticationHasRole(authentication, Role.AGENT) && isForbiddenStatusForAgent(status);
+    private void validateUpdatedTicket(Ticket ticket, UpdateTicketInput input, Authentication authentication) {
+        if (isForbiddenTicketStatus(input.getStatus(), authentication) ||
+                isNonAuthorUpdate(ticket, input, authentication)) {
+            throw new ForbiddenException();
+        }
+
+    }
+
+    private boolean isNonAuthorUpdate(Ticket ticket, UpdateTicketInput input, Authentication authentication) {
+        return !ticket.getAuthor().getUsername().equals(authentication.getName()) &&
+                (!ticket.getTitle().equals(input.getTitle()) ||
+                        !ticket.getDescription().equals(input.getDescription()) ||
+                        ticket.getCategory() != input.getCategory() ||
+                        ticket.getPriority() != input.getPriority());
+    }
+
+    private boolean isForbiddenTicketStatus(Status status, Authentication authentication) {
+        return (authenticationHasRole(authentication, Role.CLIENT) && isForbiddenTicketStatusForClient(status)) ||
+                authenticationHasRole(authentication, Role.AGENT) && isForbiddenTicketStatusForAgent(status);
     }
 
     private boolean authenticationHasRole(Authentication authentication, Role role) {
         return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
-    private boolean isForbiddenStatusForClient(Status status) {
+    private boolean isForbiddenTicketStatusForClient(Status status) {
         return status == Status.IN_PROGRESS || status == Status.RESOLVED;
     }
 
-    private boolean isForbiddenStatusForAgent(Status status) {
+    private boolean isForbiddenTicketStatusForAgent(Status status) {
         return status == Status.CLOSED;
     }
 
