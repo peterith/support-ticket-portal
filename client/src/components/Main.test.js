@@ -27,6 +27,20 @@ describe("Main", () => {
     },
   ];
 
+  const ticketsNoAgent = [
+    {
+      id: 1,
+      title: "Ticket 1",
+      description: "Description 1",
+      status: StatusEnum.OPEN,
+      category: CategoryEnum.BUG,
+      priority: PriorityEnum.MEDIUM,
+      author: "noobMaster",
+      createdAt: "2020-01-01T00:00:00",
+      updatedAt: "2020-01-02T00:00:00",
+    },
+  ];
+
   it("should render ticket table and total tickets", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
@@ -312,14 +326,14 @@ describe("Main", () => {
     fireEvent.click(statusButton);
 
     const statuses = within(article).getByRole("listbox", { name: "Status" });
-    const resolvedStatus = within(statuses).getByText("Resolved");
+    const resolvedStatus = within(statuses).getByText("Closed");
     fireEvent.click(resolvedStatus);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn).toHaveBeenCalledWith(1, {
       title: "Ticket 1",
       description: "Description 1",
-      status: StatusEnum.RESOLVED,
+      status: StatusEnum.CLOSED,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.MEDIUM,
       agent: "agent007",
@@ -410,6 +424,43 @@ describe("Main", () => {
       status: StatusEnum.OPEN,
       category: CategoryEnum.BUG,
       priority: PriorityEnum.HIGH,
+      agent: "agent007",
+    });
+  });
+
+  it("should call onUpdateTicket when update agent", async () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    const mockFn = jest.fn();
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <AuthProvider initialUser={initialUser}>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsNoAgent}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={mockFn}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const assignmentButton = within(article).getByRole("button", {
+      name: "Assign to me",
+    });
+    fireEvent.click(assignmentButton);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith(1, {
+      title: "Ticket 1",
+      description: "Description 1",
+      status: StatusEnum.OPEN,
+      category: CategoryEnum.BUG,
+      priority: PriorityEnum.MEDIUM,
       agent: "agent007",
     });
   });

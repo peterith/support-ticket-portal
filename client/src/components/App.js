@@ -14,22 +14,28 @@ const App = () => {
   const { closeModal } = useModal();
 
   useEffect(() => {
+    let isMounted = true;
+
     (async () => {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/tickets`
         );
 
-        if (response.status === 200) {
-          const data = await response.json();
-          setTickets(data);
-        } else {
-          setNetworkError(true);
+        if (!response.ok) {
+          throw new Error(response.statusText);
         }
+
+        const data = await response.json();
+        if (isMounted) setTickets(data);
       } catch (error) {
         setNetworkError(true);
       }
     })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const appStyle = css`
@@ -57,13 +63,13 @@ const App = () => {
       }
     );
 
-    if (response.status === 200) {
-      const data = await response.json();
-      signIn(data.token);
-      closeModal();
-    } else if (response.status === 401) {
-      throw new Error("Invalid username or password");
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const data = await response.json();
+    signIn(data.token);
+    closeModal();
   };
 
   const handleSignOut = () => {
@@ -84,20 +90,30 @@ const App = () => {
       }
     );
 
-    if (response.status === 200) {
-      const data = await response.json();
-      setTickets((previousTickets) => [...previousTickets, data]);
-      closeModal();
-      history.push(`/tickets/${data.id}`);
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const data = await response.json();
+    setTickets((previousTickets) => [...previousTickets, data]);
+    closeModal();
+    history.push(`/tickets/${data.id}`);
   };
 
   const handleDeleteTicket = async (ticket) => {
     closeModal();
-    await fetch(`${process.env.REACT_APP_SERVER_URL}/tickets/${ticket.id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_URL}/tickets/${ticket.id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
     setTickets((previousTickets) => {
       return previousTickets.filter((previousTicket) => {
         return previousTicket.id !== ticket.id;
@@ -118,15 +134,18 @@ const App = () => {
         body: JSON.stringify(ticket),
       }
     );
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
     const data = await response.json();
 
-    if (response.ok) {
-      setTickets((previousTickets) =>
-        previousTickets.map((previousTicket) =>
-          previousTicket.id === id ? data : previousTicket
-        )
-      );
-    }
+    setTickets((previousTickets) =>
+      previousTickets.map((previousTicket) =>
+        previousTicket.id === id ? data : previousTicket
+      )
+    );
   };
 
   if (networkError) {

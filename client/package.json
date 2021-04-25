@@ -1,6 +1,6 @@
 {
   "name": "support-ticket-portal-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "11.1.5",
@@ -14,20 +14,20 @@
     "react-scripts": "4.0.3"
   },
   "devDependencies": {
-    "@emotion/jest": "11.2.1",
-    "@testing-library/jest-dom": "5.11.10",
-    "@testing-library/react": "11.2.5",
-    "@testing-library/user-event": "13.0.16",
-    "eslint": "7.23.0",
+    "@emotion/jest": "11.3.0",
+    "@testing-library/jest-dom": "5.12.0",
+    "@testing-library/react": "11.2.6",
+    "@testing-library/user-event": "13.1.5",
+    "eslint": "7.25.0",
     "eslint-config-airbnb": "18.2.1",
-    "eslint-config-prettier": "8.1.0",
+    "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "2.22.1",
-    "eslint-plugin-jest": "24.3.2",
+    "eslint-plugin-jest": "24.3.5",
     "eslint-plugin-jsx-a11y": "6.4.1",
-    "eslint-plugin-prettier": "3.3.1",
-    "eslint-plugin-react": "7.23.1",
+    "eslint-plugin-prettier": "3.4.0",
+    "eslint-plugin-react": "7.23.2",
     "eslint-plugin-react-hooks": "4.2.0",
-    "msw": "0.28.0",
+    "msw": "0.28.2",
     "prettier": "2.2.1"
   },
   "scripts": {
