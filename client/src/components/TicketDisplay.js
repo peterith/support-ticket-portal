@@ -25,6 +25,7 @@ const TicketDisplay = ({
   onUpdateStatus,
   onUpdateCategory,
   onUpdatePriority,
+  onUpdateAgent,
   className,
 }) => {
   const [errorMessage, setErrorMessage] = useState(null);
@@ -62,12 +63,24 @@ const TicketDisplay = ({
     color: #fff;
     background-color: transparent;
     border: none;
-    font-size: 20px;
     cursor: pointer;
   `;
 
   const closeButtonStyle = css`
     float: right;
+    font-size: 1.5rem;
+  `;
+
+  const deleteButtonStyle = css`
+    font-size: 1.3rem;
+  `;
+
+  const assignButtonStyle = css`
+    padding: 0px;
+    transition: color 0.3s;
+    &:hover {
+      color: #888;
+    }
   `;
 
   const h2Style = css`
@@ -129,6 +142,14 @@ const TicketDisplay = ({
   const handleUpdate = (onUpdate) => async (data) => {
     try {
       await onUpdate(data);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
+  const handleUpdateAgent = async () => {
+    try {
+      await onUpdateAgent(user.username);
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -223,7 +244,18 @@ const TicketDisplay = ({
           <strong>Agent</strong>
         </div>
         <span aria-labelledby="ticket-agent" css={cellStyle}>
-          {ticket.agent}
+          {ticket.agent ||
+            (user && user.role === RoleEnum.AGENT ? (
+              <button
+                type="button"
+                onClick={handleUpdateAgent}
+                css={[buttonStyle, assignButtonStyle]}
+              >
+                Assign to me
+              </button>
+            ) : (
+              <em>Unassigned</em>
+            ))}
         </span>
         <div id="ticket-created" css={cellStyle}>
           <strong>Created</strong>
@@ -246,7 +278,7 @@ const TicketDisplay = ({
             onConfirm,
           })}
           aria-label="delete"
-          css={buttonStyle}
+          css={[buttonStyle, deleteButtonStyle]}
         >
           <FontAwesomeIcon icon={faTrashAlt} />
         </button>
@@ -279,6 +311,7 @@ TicketDisplay.propTypes = {
   onUpdateStatus: PropTypes.func.isRequired,
   onUpdateCategory: PropTypes.func.isRequired,
   onUpdatePriority: PropTypes.func.isRequired,
+  onUpdateAgent: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 

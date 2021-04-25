@@ -24,6 +24,18 @@ describe("Ticket Display", () => {
     updatedAt: "2020-01-02T00:00:00",
   };
 
+  const ticketNoAgent = {
+    id: 1,
+    title: "Ticket 1",
+    description: "Description 1",
+    status: StatusEnum.OPEN,
+    category: CategoryEnum.BUG,
+    priority: PriorityEnum.MEDIUM,
+    author: "noobMaster",
+    createdAt: "2020-01-01T00:00:00",
+    updatedAt: "2020-01-02T00:00:00",
+  };
+
   it("should render ticket display", () => {
     render(
       <AuthProvider>
@@ -36,6 +48,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -87,6 +100,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -123,6 +137,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -159,6 +174,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -195,6 +211,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -217,6 +234,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -253,6 +271,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -289,6 +308,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -314,6 +334,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>,
@@ -347,6 +368,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -385,6 +407,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -421,6 +444,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={mockFn}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -453,6 +477,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={mockFn}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -483,6 +508,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={mockFn}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -517,6 +543,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={mockFn}
             onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -549,6 +576,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={mockFn}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -581,6 +609,7 @@ describe("Ticket Display", () => {
             onUpdateStatus={jest.fn()}
             onUpdateCategory={jest.fn()}
             onUpdatePriority={mockFn}
+            onUpdateAgent={jest.fn()}
           />
         </ModalProvider>
       </AuthProvider>
@@ -592,6 +621,107 @@ describe("Ticket Display", () => {
     const categories = screen.getByRole("listbox", { name: "Priority" });
     const highPriority = within(categories).getByText("High");
     fireEvent.click(highPriority);
+
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
+  });
+
+  it("should render assignment button when no agent and user is agent", async () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticketNoAgent}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const assignmentButton = screen.getByRole("button", {
+      name: "Assign to me",
+    });
+    expect(assignmentButton).toBeInTheDocument();
+  });
+
+  it("should render Unassigned when no agent and no user", async () => {
+    render(
+      <AuthProvider>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticketNoAgent}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const agentField = screen.getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("Unassigned");
+  });
+
+  it("should render Unassigned when no agent and user is client", async () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticketNoAgent}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const agentField = screen.getByLabelText("Agent");
+    expect(agentField).toHaveTextContent("Unassigned");
+  });
+
+  it("should call onUpdateAgent when update agent", async () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticketNoAgent}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+            onUpdateAgent={mockFn}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const assignmentButton = screen.getByRole("button", {
+      name: "Assign to me",
+    });
+    fireEvent.click(assignmentButton);
 
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Network error");

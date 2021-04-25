@@ -74,6 +74,7 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
           onUpdateStatus={handleUpdate("status")}
           onUpdateCategory={handleUpdate("category")}
           onUpdatePriority={handleUpdate("priority")}
+          onUpdateAgent={handleUpdate("agent")}
           css={displayStyle}
         />
       )}

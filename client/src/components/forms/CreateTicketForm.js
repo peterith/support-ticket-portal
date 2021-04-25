@@ -91,7 +91,7 @@ const CreateTicketForm = ({ onSubmit }) => {
     try {
       event.preventDefault();
       validateForm();
-      onSubmit(formValues);
+      await onSubmit(formValues);
     } catch (error) {
       setErrorMessage(error.message);
     }
