@@ -1,11 +1,11 @@
-# Ticket Tracking System
+# Support Ticket Portal
 
-A customer support ticket system for SaaS companies.
+A customer support ticket portal for SaaS companies.
 
 ## Roadmap
 
-- 1.0 - Minimum variable product
-- 1.1 - Authentication and authorisation
+- 1.0 - Minimum variable product ✅
+- 1.1 - Authentication and authorisation ✅
 - 1.2 - Filter, search, sort and pagination
 - 1.3 - Comment
 
