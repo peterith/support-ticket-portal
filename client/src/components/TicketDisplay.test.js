@@ -54,37 +54,39 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const heading = screen.getByRole("heading", { name: "Ticket 1" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const heading = within(article).getByRole("heading", { name: "Ticket 1" });
     expect(heading).toBeInTheDocument();
 
-    const descriptionField = screen.getByLabelText("Description");
+    const descriptionField = within(article).getByLabelText("Description");
     expect(descriptionField).toHaveTextContent("Description 1");
 
-    const idField = screen.getByLabelText("ID");
+    const idField = within(article).getByLabelText("ID");
     expect(idField).toHaveTextContent("1");
 
-    const statusField = screen.getByLabelText("Status");
+    const statusField = within(article).getByLabelText("Status");
     expect(statusField).toHaveTextContent("Open");
 
-    const categoryField = screen.getByLabelText("Category");
+    const categoryField = within(article).getByLabelText("Category");
     expect(categoryField).toHaveTextContent("BUG");
 
-    const priorityField = screen.getByLabelText("Priority");
-    const mediumPriority = screen.getByRole("img", {
+    const priorityField = within(article).getByLabelText("Priority");
+    const mediumPriority = within(article).getByRole("img", {
       name: "medium priority",
     });
     expect(priorityField).toContainElement(mediumPriority);
 
-    const authorField = screen.getByLabelText("Author");
+    const authorField = within(article).getByLabelText("Author");
     expect(authorField).toHaveTextContent("noobMaster");
 
-    const agentField = screen.getByLabelText("Agent");
+    const agentField = within(article).getByLabelText("Agent");
     expect(agentField).toHaveTextContent("agent007");
 
-    const createdField = screen.getByLabelText("Created");
+    const createdField = within(article).getByLabelText("Created");
     expect(createdField).toBeInTheDocument();
 
-    const modifiedField = screen.getByLabelText("Modified");
+    const modifiedField = within(article).getByLabelText("Modified");
     expect(modifiedField).toBeInTheDocument();
   });
 
@@ -106,21 +108,31 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const descriptionButton = screen.queryByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const descriptionButton = within(article).queryByRole("button", {
       name: "Description",
     });
     expect(descriptionButton).not.toBeInTheDocument();
 
-    const statusButton = screen.queryByRole("button", { name: "Status" });
+    const statusButton = within(article).queryByRole("button", {
+      name: "Status",
+    });
     expect(statusButton).not.toBeInTheDocument();
 
-    const categoryButton = screen.queryByRole("button", { name: "Category" });
+    const categoryButton = within(article).queryByRole("button", {
+      name: "Category",
+    });
     expect(categoryButton).not.toBeInTheDocument();
 
-    const priorityButton = screen.queryByRole("button", { name: "Priority" });
+    const priorityButton = within(article).queryByRole("button", {
+      name: "Priority",
+    });
     expect(priorityButton).not.toBeInTheDocument();
 
-    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    const deleteButton = within(article).queryByRole("button", {
+      name: "delete",
+    });
     expect(deleteButton).not.toBeInTheDocument();
   });
 
@@ -143,21 +155,31 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const descriptionButton = screen.queryByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const descriptionButton = within(article).queryByRole("button", {
       name: "Description",
     });
     expect(descriptionButton).not.toBeInTheDocument();
 
-    const statusButton = screen.getByRole("button", { name: "Status" });
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
     expect(statusButton).toBeInTheDocument();
 
-    const categoryButton = screen.queryByRole("button", { name: "Category" });
+    const categoryButton = within(article).queryByRole("button", {
+      name: "Category",
+    });
     expect(categoryButton).not.toBeInTheDocument();
 
-    const priorityButton = screen.queryByRole("button", { name: "Priority" });
+    const priorityButton = within(article).queryByRole("button", {
+      name: "Priority",
+    });
     expect(priorityButton).not.toBeInTheDocument();
 
-    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    const deleteButton = within(article).queryByRole("button", {
+      name: "delete",
+    });
     expect(deleteButton).not.toBeInTheDocument();
   });
 
@@ -180,21 +202,31 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const descriptionButton = screen.getByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const descriptionButton = within(article).getByRole("button", {
       name: "Description",
     });
     expect(descriptionButton).toBeInTheDocument();
 
-    const statusButton = screen.getByRole("button", { name: "Status" });
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
     expect(statusButton).toBeInTheDocument();
 
-    const categoryButton = screen.getByRole("button", { name: "Category" });
+    const categoryButton = within(article).getByRole("button", {
+      name: "Category",
+    });
     expect(categoryButton).toBeInTheDocument();
 
-    const priorityButton = screen.getByRole("button", { name: "Priority" });
+    const priorityButton = within(article).getByRole("button", {
+      name: "Priority",
+    });
     expect(priorityButton).toBeInTheDocument();
 
-    const deleteButton = screen.getByRole("button", { name: "delete" });
+    const deleteButton = within(article).getByRole("button", {
+      name: "delete",
+    });
     expect(deleteButton).toBeInTheDocument();
   });
 
@@ -217,7 +249,10 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const deleteButton = screen.queryByRole("button", { name: "delete" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const deleteButton = within(article).queryByRole("button", {
+      name: "delete",
+    });
     expect(deleteButton).not.toBeInTheDocument();
   });
 
@@ -240,10 +275,14 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const statusButton = screen.getByRole("button", { name: "Status" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
     fireEvent.click(statusButton);
 
-    const statuses = screen.getByRole("listbox", { name: "Status" });
+    const statuses = within(article).getByRole("listbox", { name: "Status" });
 
     const openStatus = within(statuses).getByText("Open");
     expect(openStatus).toBeInTheDocument();
@@ -277,10 +316,14 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const statusButton = screen.getByRole("button", { name: "Status" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
     fireEvent.click(statusButton);
 
-    const statuses = screen.getByRole("listbox", { name: "Status" });
+    const statuses = within(article).getByRole("listbox", { name: "Status" });
 
     const openStatus = within(statuses).getByText("Open");
     expect(openStatus).toBeInTheDocument();
@@ -314,7 +357,9 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const closeButton = screen.getByRole("button", { name: "close" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const closeButton = within(article).getByRole("button", { name: "close" });
     fireEvent.click(closeButton);
 
     expect(mockFn).toHaveBeenCalledTimes(1);
@@ -341,7 +386,10 @@ describe("Ticket Display", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const deleteButton = screen.getByRole("button", { name: "delete" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const deleteButton = within(article).getByRole("button", {
+      name: "delete",
+    });
     fireEvent.click(deleteButton);
 
     const modal = screen.getByRole("dialog", { name: "Confirmation" });
@@ -352,6 +400,45 @@ describe("Ticket Display", () => {
 
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn).toHaveBeenCalledWith(ticket);
+  });
+
+  it("should render alert when delete ticket and get network error", () => {
+    const initialUser = { username: "noobMaster", role: RoleEnum.CLIENT };
+    const mockFn = jest.fn(() => {
+      throw new Error("Network error");
+    });
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticket}
+            onClose={jest.fn()}
+            onDelete={mockFn}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+            onUpdateAgent={jest.fn()}
+          />
+        </ModalProvider>
+      </AuthProvider>,
+      { container: document.body.appendChild(container).firstChild }
+    );
+
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const deleteButton = within(article).getByRole("button", {
+      name: "delete",
+    });
+    fireEvent.click(deleteButton);
+
+    const modal = screen.getByRole("dialog", { name: "Confirmation" });
+    const confirmButton = within(modal).getByRole("button", {
+      name: "Confirm",
+    });
+    fireEvent.click(confirmButton);
+
+    const alert = within(article).getByRole("alert");
+    expect(alert).toHaveTextContent("Network error");
   });
 
   it("should call onUpdateDescription when update description", async () => {
@@ -374,12 +461,14 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const descriptionButton = screen.getByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const descriptionButton = within(article).getByRole("button", {
       name: "Description",
     });
     fireEvent.click(descriptionButton);
 
-    const descriptionField = screen.getByRole("textbox", {
+    const descriptionField = within(article).getByRole("textbox", {
       name: "Description",
     });
     fireEvent.change(descriptionField, {
@@ -413,12 +502,14 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const descriptionButton = screen.getByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const descriptionButton = within(article).getByRole("button", {
       name: "Description",
     });
     fireEvent.click(descriptionButton);
 
-    const descriptionField = screen.getByRole("textbox", {
+    const descriptionField = within(article).getByRole("textbox", {
       name: "Description",
     });
     fireEvent.change(descriptionField, {
@@ -426,7 +517,7 @@ describe("Ticket Display", () => {
     });
     fireEvent.blur(descriptionField);
 
-    const alert = screen.getByRole("alert");
+    const alert = within(article).getByRole("alert");
     expect(alert).toHaveTextContent("Network error");
   });
 
@@ -450,10 +541,14 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const statusButton = screen.getByRole("button", { name: "Status" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
     fireEvent.click(statusButton);
 
-    const statuses = screen.getByRole("listbox", { name: "Status" });
+    const statuses = within(article).getByRole("listbox", { name: "Status" });
     const closedStatus = within(statuses).getByText("Closed");
     fireEvent.click(closedStatus);
 
@@ -483,14 +578,18 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const statusButton = screen.getByRole("button", { name: "Status" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const statusButton = within(article).getByRole("button", {
+      name: "Status",
+    });
     fireEvent.click(statusButton);
 
-    const statuses = screen.getByRole("listbox", { name: "Status" });
+    const statuses = within(article).getByRole("listbox", { name: "Status" });
     const closedStatus = within(statuses).getByText("Closed");
     fireEvent.click(closedStatus);
 
-    const alert = screen.getByRole("alert");
+    const alert = within(article).getByRole("alert");
     expect(alert).toHaveTextContent("Network error");
   });
 
@@ -514,10 +613,16 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const categoryButton = screen.getByRole("button", { name: "Category" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const categoryButton = within(article).getByRole("button", {
+      name: "Category",
+    });
     fireEvent.click(categoryButton);
 
-    const categories = screen.getByRole("listbox", { name: "Category" });
+    const categories = within(article).getByRole("listbox", {
+      name: "Category",
+    });
     const technicalIssueCategory = within(categories).getByText(
       "Technical Issue"
     );
@@ -549,16 +654,22 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const categoryButton = screen.getByRole("button", { name: "Category" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const categoryButton = within(article).getByRole("button", {
+      name: "Category",
+    });
     fireEvent.click(categoryButton);
 
-    const categories = screen.getByRole("listbox", { name: "Category" });
+    const categories = within(article).getByRole("listbox", {
+      name: "Category",
+    });
     const technicalIssueCategory = within(categories).getByText(
       "Technical Issue"
     );
     fireEvent.click(technicalIssueCategory);
 
-    const alert = screen.getByRole("alert");
+    const alert = within(article).getByRole("alert");
     expect(alert).toHaveTextContent("Network error");
   });
 
@@ -582,10 +693,16 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const priorityButton = screen.getByRole("button", { name: "Priority" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const priorityButton = within(article).getByRole("button", {
+      name: "Priority",
+    });
     fireEvent.click(priorityButton);
 
-    const categories = screen.getByRole("listbox", { name: "Priority" });
+    const categories = within(article).getByRole("listbox", {
+      name: "Priority",
+    });
     const highPriority = within(categories).getByText("High");
     fireEvent.click(highPriority);
 
@@ -615,14 +732,20 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const priorityButton = screen.getByRole("button", { name: "Priority" });
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const priorityButton = within(article).getByRole("button", {
+      name: "Priority",
+    });
     fireEvent.click(priorityButton);
 
-    const categories = screen.getByRole("listbox", { name: "Priority" });
+    const categories = within(article).getByRole("listbox", {
+      name: "Priority",
+    });
     const highPriority = within(categories).getByText("High");
     fireEvent.click(highPriority);
 
-    const alert = screen.getByRole("alert");
+    const alert = within(article).getByRole("alert");
     expect(alert).toHaveTextContent("Network error");
   });
 
@@ -645,7 +768,8 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const assignmentButton = screen.getByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const assignmentButton = within(article).getByRole("button", {
       name: "Assign to me",
     });
     expect(assignmentButton).toBeInTheDocument();
@@ -669,7 +793,8 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const agentField = screen.getByLabelText("Agent");
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const agentField = within(article).getByLabelText("Agent");
     expect(agentField).toHaveTextContent("Unassigned");
   });
 
@@ -692,11 +817,43 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const agentField = screen.getByLabelText("Agent");
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    const agentField = within(article).getByLabelText("Agent");
     expect(agentField).toHaveTextContent("Unassigned");
   });
 
   it("should call onUpdateAgent when update agent", async () => {
+    const initialUser = { username: "agent007", role: RoleEnum.AGENT };
+    const mockFn = jest.fn();
+    render(
+      <AuthProvider initialUser={initialUser}>
+        <ModalProvider>
+          <TicketDisplay
+            ticket={ticketNoAgent}
+            onClose={jest.fn()}
+            onDelete={jest.fn()}
+            onUpdateDescription={jest.fn()}
+            onUpdateStatus={jest.fn()}
+            onUpdateCategory={jest.fn()}
+            onUpdatePriority={jest.fn()}
+            onUpdateAgent={mockFn}
+          />
+        </ModalProvider>
+      </AuthProvider>
+    );
+
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const assignmentButton = within(article).getByRole("button", {
+      name: "Assign to me",
+    });
+    fireEvent.click(assignmentButton);
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith("agent007");
+  });
+
+  it("should render alert when update agent and get network error", async () => {
     const initialUser = { username: "agent007", role: RoleEnum.AGENT };
     const mockFn = jest.fn(() => {
       throw new Error("Network error");
@@ -718,12 +875,14 @@ describe("Ticket Display", () => {
       </AuthProvider>
     );
 
-    const assignmentButton = screen.getByRole("button", {
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+
+    const assignmentButton = within(article).getByRole("button", {
       name: "Assign to me",
     });
     fireEvent.click(assignmentButton);
 
-    const alert = screen.getByRole("alert");
+    const alert = within(article).getByRole("alert");
     expect(alert).toHaveTextContent("Network error");
   });
 });

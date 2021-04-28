@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import Modal from "./Modal";
 
 describe("Modal", () => {
@@ -9,10 +9,12 @@ describe("Modal", () => {
       </Modal>
     );
 
-    const heading = screen.getByRole("heading");
+    const modal = screen.getByRole("dialog");
+
+    const heading = within(modal).getByRole("heading");
     expect(heading).toHaveTextContent("Create ticket");
 
-    const content = screen.getByTestId("test");
+    const content = within(modal).getByTestId("test");
     expect(content).toBeInTheDocument();
   });
 
@@ -24,7 +26,8 @@ describe("Modal", () => {
       </Modal>
     );
 
-    const closeButton = screen.getByRole("button", { name: "close" });
+    const modal = screen.getByRole("dialog");
+    const closeButton = within(modal).getByRole("button", { name: "close" });
     fireEvent.click(closeButton);
 
     expect(mockFn).toHaveBeenCalledTimes(1);

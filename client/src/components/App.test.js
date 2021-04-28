@@ -320,43 +320,23 @@ describe("App", () => {
     fireEvent.click(submitButton);
 
     const table = screen.getByRole("table");
-    const [head, body] = within(table).getAllByRole("rowgroup");
-    const headers = within(head).getAllByRole("columnheader");
-
+    const [, body] = within(table).getAllByRole("rowgroup");
     const rows = await waitFor(() => {
       const r = within(body).getAllByRole("row");
       expect(r).toHaveLength(2);
       return r;
     });
+    const ticket = within(rows[1]).getAllByRole("cell");
 
-    const ticket1 = within(rows[0]).getAllByRole("cell");
-    const ticket2 = within(rows[1]).getAllByRole("cell");
+    expect(ticket[0]).toHaveTextContent("3");
+    expect(ticket[1]).toHaveTextContent("Ticket 2");
+    expect(ticket[2]).toHaveTextContent("Open");
+    expect(ticket[3]).toHaveTextContent("FEATURE REQUEST");
 
-    expect(headers[0]).toHaveTextContent("ID");
-    expect(headers[1]).toHaveTextContent("Title");
-    expect(headers[2]).toHaveTextContent("Status");
-    expect(headers[3]).toHaveTextContent("Category");
-    expect(headers[4]).toHaveTextContent("Priority");
-
-    expect(ticket1[0]).toHaveTextContent("1");
-    expect(ticket1[1]).toHaveTextContent("Ticket 1");
-    expect(ticket1[2]).toHaveTextContent("Open");
-    expect(ticket1[3]).toHaveTextContent("BUG");
-
-    const mediumPriority1 = within(ticket1[4]).getByRole("img", {
+    const mediumPriority = within(ticket[4]).getByRole("img", {
       name: "medium priority",
     });
-    expect(ticket1[4]).toContainElement(mediumPriority1);
-
-    expect(ticket2[0]).toHaveTextContent("3");
-    expect(ticket2[1]).toHaveTextContent("Ticket 2");
-    expect(ticket2[2]).toHaveTextContent("Open");
-    expect(ticket2[3]).toHaveTextContent("FEATURE REQUEST");
-
-    const mediumPriority2 = within(ticket2[4]).getByRole("img", {
-      name: "medium priority",
-    });
-    expect(ticket2[4]).toContainElement(mediumPriority2);
+    expect(ticket[4]).toContainElement(mediumPriority);
 
     const totalTickets = screen.getByLabelText("Total tickets:");
     expect(totalTickets).toHaveTextContent("2");

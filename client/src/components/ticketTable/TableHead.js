@@ -3,13 +3,13 @@ import { css } from "@emotion/react";
 
 const TableHead = () => {
   const theadStyle = css`
-    background-color: #333;
+    background-color: #444;
     color: #fff;
     font-size: 1.1rem;
   `;
 
   const thStyle = css`
-    padding: 10px;
+    padding: 15px;
   `;
 
   return (
