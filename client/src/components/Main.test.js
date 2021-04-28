@@ -41,7 +41,34 @@ describe("Main", () => {
     },
   ];
 
-  it("should render ticket table and total tickets", async () => {
+  const ticketsToFilter = [
+    {
+      id: 1,
+      title: "Ticket 1",
+      description: "Description 1",
+      status: StatusEnum.OPEN,
+      category: CategoryEnum.BUG,
+      priority: PriorityEnum.MEDIUM,
+      author: "noobMaster",
+      agent: "agent007",
+      createdAt: "2020-01-01T00:00:00",
+      updatedAt: "2020-01-02T00:00:00",
+    },
+    {
+      id: 2,
+      title: "Ticket 2",
+      description: "Description 2",
+      status: StatusEnum.IN_PROGRESS,
+      category: CategoryEnum.ACCOUNT,
+      priority: PriorityEnum.LOW,
+      author: "johnDoe",
+      agent: "joeBloggs",
+      createdAt: "2020-01-03T00:00:00",
+      updatedAt: "2020-01-04T00:00:00",
+    },
+  ];
+
+  it("should render main", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
         <AuthProvider>
@@ -57,6 +84,10 @@ describe("Main", () => {
         </AuthProvider>
       </MemoryRouter>
     );
+
+    const search = screen.getByRole("search");
+    const statusField = within(search).getByLabelText("Status");
+    expect(statusField).toHaveDisplayValue("All");
 
     const table = screen.getByRole("table");
     const [head, body] = within(table).getAllByRole("rowgroup");
@@ -159,39 +190,7 @@ describe("Main", () => {
     );
 
     const article = screen.getByRole("article", { name: "Ticket 1" });
-
-    const heading = within(article).getByRole("heading", { name: "Ticket 1" });
-    expect(heading).toBeInTheDocument();
-
-    const descriptionField = within(article).getByLabelText("Description");
-    expect(descriptionField).toHaveTextContent("Description 1");
-
-    const idField = within(article).getByLabelText("ID");
-    expect(idField).toHaveTextContent("1");
-
-    const statusField = within(article).getByLabelText("Status");
-    expect(statusField).toHaveTextContent("Open");
-
-    const categoryField = within(article).getByLabelText("Category");
-    expect(categoryField).toHaveTextContent("BUG");
-
-    const priorityField = within(article).getByLabelText("Priority");
-    const mediumPriority = within(article).getByRole("img", {
-      name: "medium priority",
-    });
-    expect(priorityField).toContainElement(mediumPriority);
-
-    const authorField = within(article).getByLabelText("Author");
-    expect(authorField).toHaveTextContent("noobMaster");
-
-    const agentField = within(article).getByLabelText("Agent");
-    expect(agentField).toHaveTextContent("agent007");
-
-    const createdField = within(article).getByLabelText("Created");
-    expect(createdField).toBeInTheDocument();
-
-    const modifiedField = within(article).getByLabelText("Modified");
-    expect(modifiedField).toBeInTheDocument();
+    expect(article).toBeInTheDocument();
   });
 
   it("should close ticket display when click on close button", async () => {
@@ -463,5 +462,115 @@ describe("Main", () => {
       priority: PriorityEnum.MEDIUM,
       agent: "agent007",
     });
+  });
+
+  it("should render all tickets when filter by status All", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+
+    const statusField = within(search).getByLabelText("Status");
+    fireEvent.change(statusField, { target: { value: "All" } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(2);
+  });
+
+  it("should render filtered tickets when filter by status", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+
+    const statusField = within(search).getByLabelText("Status");
+    fireEvent.change(statusField, { target: { value: StatusEnum.OPEN } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when URL query contains status", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets?status=OPEN"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets and ticket display when filter by status and ticket display is open", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets/1"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+
+    const statusField = within(search).getByLabelText("Status");
+    fireEvent.change(statusField, { target: { value: StatusEnum.OPEN } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+
+    const article = screen.getByRole("article", { name: "Ticket 1" });
+    expect(article).toBeInTheDocument();
   });
 });

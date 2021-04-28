@@ -24,10 +24,14 @@ describe("Header", () => {
       </AuthProvider>
     );
 
-    const logo = screen.getByRole("heading", { name: "Support Ticket Portal" });
+    const header = screen.getByRole("banner");
+
+    const logo = within(header).getByRole("heading", {
+      name: "Support Ticket Portal",
+    });
     expect(logo).toBeInTheDocument();
 
-    const createButton = screen.getByRole("button", { name: "Create" });
+    const createButton = within(header).getByRole("button", { name: "Create" });
     expect(createButton).toBeInTheDocument();
   });
 
@@ -44,7 +48,10 @@ describe("Header", () => {
       </AuthProvider>
     );
 
-    const signInButton = screen.getByRole("button", { name: "Sign In" });
+    const header = screen.getByRole("banner");
+    const signInButton = within(header).getByRole("button", {
+      name: "Sign In",
+    });
     expect(signInButton).toBeInTheDocument();
   });
 
@@ -62,10 +69,14 @@ describe("Header", () => {
       </AuthProvider>
     );
 
-    const username = screen.getByText("noobMaster");
+    const header = screen.getByRole("banner");
+
+    const username = within(header).getByText("noobMaster");
     expect(username).toBeInTheDocument();
 
-    const signOutButton = screen.getByRole("button", { name: "Sign Out" });
+    const signOutButton = within(header).getByRole("button", {
+      name: "Sign Out",
+    });
     expect(signOutButton).toBeInTheDocument();
   });
 
@@ -84,7 +95,10 @@ describe("Header", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const signInButton = screen.getByRole("button", { name: "Sign In" });
+    const header = screen.getByRole("banner");
+    const signInButton = within(header).getByRole("button", {
+      name: "Sign In",
+    });
     fireEvent.click(signInButton);
 
     const signInForm = screen.getByRole("dialog", { name: "Sign In" });
@@ -123,7 +137,10 @@ describe("Header", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const signOutButton = screen.getByRole("button", { name: "Sign Out" });
+    const header = screen.getByRole("banner");
+    const signOutButton = within(header).getByRole("button", {
+      name: "Sign Out",
+    });
     fireEvent.click(signOutButton);
 
     const modal = screen.getByRole("dialog", { name: "Confirmation" });
@@ -149,7 +166,8 @@ describe("Header", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const createButton = screen.getByRole("button", { name: "Create" });
+    const header = screen.getByRole("banner");
+    const createButton = within(header).getByRole("button", { name: "Create" });
     fireEvent.click(createButton);
 
     const createTicketForm = screen.queryByRole("dialog", {
@@ -174,7 +192,8 @@ describe("Header", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const createButton = screen.getByRole("button", { name: "Create" });
+    const header = screen.getByRole("banner");
+    const createButton = within(header).getByRole("button", { name: "Create" });
     fireEvent.click(createButton);
 
     const createTicketForm = screen.queryByRole("dialog", {
@@ -199,7 +218,8 @@ describe("Header", () => {
       { container: document.body.appendChild(container).firstChild }
     );
 
-    const createButton = screen.getByRole("button", { name: "Create" });
+    const header = screen.getByRole("banner");
+    const createButton = within(header).getByRole("button", { name: "Create" });
     fireEvent.click(createButton);
 
     const createTicketForm = screen.getByRole("dialog", {

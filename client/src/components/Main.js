@@ -1,14 +1,29 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useMemo } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import TicketTable from "./ticketTable";
 import TicketDisplay from "./TicketDisplay";
+import SearchFilter from "./SearchFilter";
 
 const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   const { id } = useParams();
   const history = useHistory();
+  const location = useLocation();
+  const [filteredTickets, setFilteredTickets] = useState(tickets);
+  const query = useMemo(() => new URLSearchParams(location.search), [location]);
+
+  useEffect(() => {
+    let newFilteredTickets = tickets;
+
+    const status = query.get("status");
+    if (status) {
+      newFilteredTickets = tickets.filter((ticket) => ticket.status === status);
+    }
+
+    setFilteredTickets(newFilteredTickets);
+  }, [tickets, query]);
 
   const selectedTicket = useMemo(() => {
     return tickets.find((ticket) => ticket.id === Number(id));
@@ -30,12 +45,29 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     text-align: center;
   `;
 
+  const handleFilterByStatus = (newStatus) => {
+    let path = "/tickets";
+
+    if (id) {
+      path = path.concat(`/${id}`);
+    }
+
+    query.delete("status");
+
+    if (newStatus) {
+      query.append("status", newStatus);
+      path = path.concat(`?${query.toString()}`);
+    }
+
+    history.push(path);
+  };
+
   const handleClickRow = (ticket) => {
-    history.push(`/tickets/${ticket.id}`);
+    history.push(`/tickets/${ticket.id}?${query.toString()}`);
   };
 
   const handleClickClose = () => {
-    history.push(`/tickets`);
+    history.push(`/tickets?${query.toString()}`);
   };
 
   const handleUpdate = (field) => async (value) => {
@@ -55,8 +87,12 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   return (
     <main css={mainStyle} className={className}>
       <div css={tableStyle}>
+        <SearchFilter
+          status={query.get("status")}
+          onFilterByStatus={handleFilterByStatus}
+        />
         <TicketTable
-          tickets={tickets}
+          tickets={filteredTickets}
           selectedRow={Number(id)}
           onClickRow={handleClickRow}
         />
