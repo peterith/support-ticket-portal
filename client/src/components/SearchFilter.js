@@ -5,12 +5,14 @@ import { useState } from "react";
 import { CategoryEnum, PriorityEnum, StatusEnum } from "../enums";
 
 const SearchFilter = ({
+  initialSearch,
   initialStatus,
   initialCategory,
   initialPriority,
   onFilter,
 }) => {
   const [filter, setFilter] = useState({
+    search: initialSearch,
     status: initialStatus,
     category: initialCategory,
     priority: initialPriority,
@@ -23,6 +25,13 @@ const SearchFilter = ({
     background-color: #333;
   `;
 
+  const searchBarStyle = css`
+    width: 200px;
+    padding: 5px;
+    border: 2px solid #999;
+    border-radius: 5px;
+  `;
+
   const filterFieldStyle = css`
     padding: 10px 20px;
   `;
@@ -33,6 +42,16 @@ const SearchFilter = ({
     border: 2px solid #999;
     border-radius: 5px;
   `;
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+
+    setFilter((previousFilter) => {
+      const newFilter = { ...previousFilter, search: value };
+      onFilter(newFilter);
+      return newFilter;
+    });
+  };
 
   const handleFilter = (event) => {
     const { name, value } = event.target;
@@ -49,6 +68,15 @@ const SearchFilter = ({
 
   return (
     <div role="search" css={searchFilterStyle}>
+      <div css={filterFieldStyle}>
+        <input
+          type="text"
+          placeholder="🔎 Search"
+          value={filter.search || ""}
+          onChange={handleSearch}
+          css={searchBarStyle}
+        />
+      </div>
       <div css={filterFieldStyle}>
         <label htmlFor="filter-status">
           Status
@@ -111,6 +139,7 @@ const SearchFilter = ({
 };
 
 SearchFilter.propTypes = {
+  initialSearch: PropTypes.string,
   initialStatus: PropTypes.string,
   initialCategory: PropTypes.string,
   initialPriority: PropTypes.string,
@@ -118,6 +147,7 @@ SearchFilter.propTypes = {
 };
 
 SearchFilter.defaultProps = {
+  initialSearch: "",
   initialStatus: null,
   initialCategory: null,
   initialPriority: null,

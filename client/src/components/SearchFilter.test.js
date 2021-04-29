@@ -24,6 +24,7 @@ describe("Search Filter", () => {
       status: StatusEnum.OPEN,
       category: null,
       priority: null,
+      search: "",
     });
   });
 
@@ -40,6 +41,7 @@ describe("Search Filter", () => {
       status: null,
       category: null,
       priority: null,
+      search: "",
     });
   });
 
@@ -56,6 +58,7 @@ describe("Search Filter", () => {
       status: null,
       category: CategoryEnum.BUG,
       priority: null,
+      search: "",
     });
   });
 
@@ -72,6 +75,7 @@ describe("Search Filter", () => {
       status: null,
       category: null,
       priority: null,
+      search: "",
     });
   });
 
@@ -88,6 +92,7 @@ describe("Search Filter", () => {
       status: null,
       category: null,
       priority: PriorityEnum.MEDIUM,
+      search: "",
     });
   });
 
@@ -104,6 +109,24 @@ describe("Search Filter", () => {
       status: null,
       category: null,
       priority: null,
+      search: "",
+    });
+  });
+
+  it("should call onFilter when search", () => {
+    const mockFn = jest.fn();
+    render(<SearchFilter onFilter={mockFn} />);
+
+    const search = screen.getByRole("search");
+    const searchBar = within(search).getByPlaceholderText("🔎 Search");
+    fireEvent.change(searchBar, { target: { value: "ticket 1" } });
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith({
+      status: null,
+      category: null,
+      priority: null,
+      search: "ticket 1",
     });
   });
 });

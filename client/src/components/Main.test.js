@@ -447,7 +447,6 @@ describe("Main", () => {
     );
 
     const article = screen.getByRole("article", { name: "Ticket 1" });
-
     const assignmentButton = within(article).getByRole("button", {
       name: "Assign to me",
     });
@@ -482,7 +481,6 @@ describe("Main", () => {
     );
 
     const search = screen.getByRole("search");
-
     const statusField = within(search).getByLabelText("Status");
     fireEvent.change(statusField, { target: { value: StatusEnum.OPEN } });
 
@@ -510,7 +508,6 @@ describe("Main", () => {
     );
 
     const search = screen.getByRole("search");
-
     const categoryField = within(search).getByLabelText("Category");
     fireEvent.change(categoryField, { target: { value: CategoryEnum.BUG } });
 
@@ -538,9 +535,143 @@ describe("Main", () => {
     );
 
     const search = screen.getByRole("search");
-
     const priorityField = within(search).getByLabelText("Priority");
     fireEvent.change(priorityField, { target: { value: PriorityEnum.MEDIUM } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when search for ID", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+    const searchBar = within(search).getByPlaceholderText("🔎 Search");
+    fireEvent.change(searchBar, { target: { value: "1" } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when search for title", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+    const searchBar = within(search).getByPlaceholderText("🔎 Search");
+    fireEvent.change(searchBar, { target: { value: "ticket 1" } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when search for description", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+    const searchBar = within(search).getByPlaceholderText("🔎 Search");
+    fireEvent.change(searchBar, { target: { value: "description 1" } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when search for author", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+    const searchBar = within(search).getByPlaceholderText("🔎 Search");
+    fireEvent.change(searchBar, { target: { value: "noobmaster" } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when search for agent", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+    const searchBar = within(search).getByPlaceholderText("🔎 Search");
+    fireEvent.change(searchBar, { target: { value: "agent007" } });
 
     const table = screen.getByRole("table");
     const [, body] = within(table).getAllByRole("rowgroup");
@@ -551,7 +682,9 @@ describe("Main", () => {
   it("should render filtered tickets when URL query contains filter parameters", async () => {
     render(
       <MemoryRouter
-        initialEntries={["/tickets?status=OPEN&category=BUG&priority=MEDIUM"]}
+        initialEntries={[
+          "/tickets?status=OPEN&category=BUG&priority=MEDIUM&search=ticket",
+        ]}
       >
         <AuthProvider>
           <ModalProvider>

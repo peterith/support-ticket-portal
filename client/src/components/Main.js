@@ -30,6 +30,19 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
       ? newFilteredTickets.filter((ticket) => ticket.priority === priority)
       : newFilteredTickets;
 
+    let search = query.get("search");
+    if (search) {
+      search = search.toLowerCase().trim();
+      newFilteredTickets = newFilteredTickets.filter(
+        (ticket) =>
+          ticket.id.toString().includes(search) ||
+          ticket.title.toLowerCase().includes(search) ||
+          ticket.description.toLowerCase().includes(search) ||
+          ticket.author.toLowerCase().includes(search) ||
+          ticket.agent?.toLowerCase().includes(search)
+      );
+    }
+
     setFilteredTickets(newFilteredTickets);
   }, [tickets, query]);
 
@@ -53,15 +66,17 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     text-align: center;
   `;
 
-  const handleFilter = ({ status, category, priority }) => {
+  const handleFilter = ({ status, category, priority, search }) => {
     let path = id ? `/tickets/${id}` : "/tickets";
     query.delete("status");
     query.delete("category");
     query.delete("priority");
+    query.delete("search");
 
     if (status) query.append("status", status);
     if (category) query.append("category", category);
     if (priority) query.append("priority", priority);
+    if (search) query.append("search", search);
 
     path = path.concat(`?${query.toString()}`);
     history.push(path);
@@ -93,8 +108,10 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     <main css={mainStyle} className={className}>
       <div css={tableStyle}>
         <SearchFilter
+          initialSearch={query.get("search")}
           initialStatus={query.get("status")}
           initialCategory={query.get("category")}
+          initialPriority={query.get("priority")}
           onFilter={handleFilter}
         />
         <TicketTable
