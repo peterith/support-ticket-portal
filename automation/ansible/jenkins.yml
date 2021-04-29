@@ -1,0 +1,39 @@
+- name: Install jenkins
+  hosts: jenkins
+  become: yes
+  tasks:
+    - name: Upgrade all packages
+      yum:
+        name: "*"
+        state: latest
+    - name: Add Jenkins repo
+      get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+    - name: Import Jenkins key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    - name: Install Jenkins and dependencies
+      yum:
+        name:
+          - jenkins
+          - git
+          - docker
+        state: latest
+    - name: Install Java 11
+      shell: amazon-linux-extras install java-openjdk11 -y
+    - name: Add jenkins user to docker group
+      ansible.builtin.user:
+        name: jenkins
+        groups: docker
+        append: yes
+    - name: Start Docker
+      ansible.builtin.systemd:
+        state: started
+        name: docker
+    - name: Start Jenkins
+      ansible.builtin.systemd:
+        state: started
+        daemon_reload: yes
+        name: jenkins

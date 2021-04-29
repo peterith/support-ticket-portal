@@ -14,7 +14,7 @@
     <name>support-ticket-portal-server</name>
     <description>Server for support ticket portal</description>
     <properties>
-        <java.version>15</java.version>
+        <java.version>11</java.version>
     </properties>
     <dependencies>
         <dependency>
