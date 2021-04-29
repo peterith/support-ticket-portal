@@ -1,9 +1,15 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
-import { StatusEnum } from "../enums";
+import { useState } from "react";
+import { CategoryEnum, StatusEnum } from "../enums";
 
-const SearchFilter = ({ status, onFilterByStatus }) => {
+const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
+  const [filter, setFilter] = useState({
+    status: initialStatus,
+    category: initialCategory,
+  });
+
   const searchFilterStyle = css`
     display: flex;
     align-items: center;
@@ -22,14 +28,17 @@ const SearchFilter = ({ status, onFilterByStatus }) => {
     border-radius: 5px;
   `;
 
-  const handleSelectStatus = (event) => {
-    const { value } = event.target;
+  const handleFilter = (event) => {
+    const { name, value } = event.target;
+    setFilter((previousFilter) => {
+      const newFilter =
+        value === "All"
+          ? { ...previousFilter, [name]: null }
+          : { ...previousFilter, [name]: value };
 
-    if (value === "All") {
-      onFilterByStatus(null);
-    } else {
-      onFilterByStatus(value);
-    }
+      onFilter(newFilter);
+      return newFilter;
+    });
   };
 
   return (
@@ -39,8 +48,9 @@ const SearchFilter = ({ status, onFilterByStatus }) => {
           Status
           <select
             id="filter-status"
-            value={status || "All"}
-            onChange={handleSelectStatus}
+            name="status"
+            value={filter.status || "All"}
+            onChange={handleFilter}
             css={selectStyle}
           >
             <option>All</option>
@@ -51,17 +61,41 @@ const SearchFilter = ({ status, onFilterByStatus }) => {
           </select>
         </label>
       </div>
+      <div css={statusStyle}>
+        <label htmlFor="filter-category">
+          Category
+          <select
+            id="filter-category"
+            name="category"
+            value={filter.category || "All"}
+            onChange={handleFilter}
+            css={selectStyle}
+          >
+            <option>All</option>
+            <option value={CategoryEnum.BUG}>Bug</option>
+            <option value={CategoryEnum.FEATURE_REQUEST}>
+              Feature Request
+            </option>
+            <option value={CategoryEnum.TECHNICAL_ISSUE}>
+              Technical Issue
+            </option>
+            <option value={CategoryEnum.ACCOUNT}>Account</option>
+          </select>
+        </label>
+      </div>
     </div>
   );
 };
 
 SearchFilter.propTypes = {
-  status: PropTypes.string,
-  onFilterByStatus: PropTypes.func.isRequired,
+  initialStatus: PropTypes.string,
+  initialCategory: PropTypes.string,
+  onFilter: PropTypes.func.isRequired,
 };
 
 SearchFilter.defaultProps = {
-  status: "",
+  initialStatus: null,
+  initialCategory: null,
 };
 
 export default SearchFilter;

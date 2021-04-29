@@ -464,34 +464,6 @@ describe("Main", () => {
     });
   });
 
-  it("should render all tickets when filter by status All", async () => {
-    render(
-      <MemoryRouter initialEntries={["/tickets"]}>
-        <AuthProvider>
-          <ModalProvider>
-            <Route exact path={["/tickets", "/tickets/:id"]}>
-              <Main
-                tickets={ticketsToFilter}
-                onDeleteTicket={jest.fn()}
-                onUpdateTicket={jest.fn()}
-              />
-            </Route>
-          </ModalProvider>
-        </AuthProvider>
-      </MemoryRouter>
-    );
-
-    const search = screen.getByRole("search");
-
-    const statusField = within(search).getByLabelText("Status");
-    fireEvent.change(statusField, { target: { value: "All" } });
-
-    const table = screen.getByRole("table");
-    const [, body] = within(table).getAllByRole("rowgroup");
-    const rows = within(body).getAllByRole("row");
-    expect(rows).toHaveLength(2);
-  });
-
   it("should render filtered tickets when filter by status", async () => {
     render(
       <MemoryRouter initialEntries={["/tickets"]}>
@@ -520,9 +492,37 @@ describe("Main", () => {
     expect(rows).toHaveLength(1);
   });
 
-  it("should render filtered tickets when URL query contains status", async () => {
+  it("should render filtered tickets when filter by category", async () => {
     render(
-      <MemoryRouter initialEntries={["/tickets?status=OPEN"]}>
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+
+    const categoryField = within(search).getByLabelText("Category");
+    fireEvent.change(categoryField, { target: { value: CategoryEnum.BUG } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
+  it("should render filtered tickets when URL query contains filter parameters", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets?status=OPEN&category=BUG"]}>
         <AuthProvider>
           <ModalProvider>
             <Route exact path={["/tickets", "/tickets/:id"]}>

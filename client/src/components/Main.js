@@ -15,12 +15,15 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   const query = useMemo(() => new URLSearchParams(location.search), [location]);
 
   useEffect(() => {
-    let newFilteredTickets = tickets;
-
     const status = query.get("status");
-    if (status) {
-      newFilteredTickets = tickets.filter((ticket) => ticket.status === status);
-    }
+    let newFilteredTickets = status
+      ? tickets.filter((ticket) => ticket.status === status)
+      : tickets;
+
+    const category = query.get("category");
+    newFilteredTickets = category
+      ? newFilteredTickets.filter((ticket) => ticket.category === category)
+      : newFilteredTickets;
 
     setFilteredTickets(newFilteredTickets);
   }, [tickets, query]);
@@ -45,20 +48,15 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     text-align: center;
   `;
 
-  const handleFilterByStatus = (newStatus) => {
-    let path = "/tickets";
-
-    if (id) {
-      path = path.concat(`/${id}`);
-    }
-
+  const handleFilter = ({ status, category }) => {
+    let path = id ? `/tickets/${id}` : "/tickets";
     query.delete("status");
+    query.delete("category");
 
-    if (newStatus) {
-      query.append("status", newStatus);
-      path = path.concat(`?${query.toString()}`);
-    }
+    if (status) query.append("status", status);
+    if (category) query.append("category", category);
 
+    path = path.concat(`?${query.toString()}`);
     history.push(path);
   };
 
@@ -88,8 +86,9 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     <main css={mainStyle} className={className}>
       <div css={tableStyle}>
         <SearchFilter
-          status={query.get("status")}
-          onFilterByStatus={handleFilterByStatus}
+          initialStatus={query.get("status")}
+          initialCategory={query.get("category")}
+          onFilter={handleFilter}
         />
         <TicketTable
           tickets={filteredTickets}
