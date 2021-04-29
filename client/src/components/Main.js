@@ -25,6 +25,11 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
       ? newFilteredTickets.filter((ticket) => ticket.category === category)
       : newFilteredTickets;
 
+    const priority = query.get("priority");
+    newFilteredTickets = priority
+      ? newFilteredTickets.filter((ticket) => ticket.priority === priority)
+      : newFilteredTickets;
+
     setFilteredTickets(newFilteredTickets);
   }, [tickets, query]);
 
@@ -48,13 +53,15 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     text-align: center;
   `;
 
-  const handleFilter = ({ status, category }) => {
+  const handleFilter = ({ status, category, priority }) => {
     let path = id ? `/tickets/${id}` : "/tickets";
     query.delete("status");
     query.delete("category");
+    query.delete("priority");
 
     if (status) query.append("status", status);
     if (category) query.append("category", category);
+    if (priority) query.append("priority", priority);
 
     path = path.concat(`?${query.toString()}`);
     history.push(path);

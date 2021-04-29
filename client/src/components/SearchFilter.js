@@ -2,12 +2,18 @@
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { CategoryEnum, StatusEnum } from "../enums";
+import { CategoryEnum, PriorityEnum, StatusEnum } from "../enums";
 
-const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
+const SearchFilter = ({
+  initialStatus,
+  initialCategory,
+  initialPriority,
+  onFilter,
+}) => {
   const [filter, setFilter] = useState({
     status: initialStatus,
     category: initialCategory,
+    priority: initialPriority,
   });
 
   const searchFilterStyle = css`
@@ -17,7 +23,7 @@ const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
     background-color: #333;
   `;
 
-  const statusStyle = css`
+  const filterFieldStyle = css`
     padding: 10px 20px;
   `;
 
@@ -43,7 +49,7 @@ const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
 
   return (
     <div role="search" css={searchFilterStyle}>
-      <div css={statusStyle}>
+      <div css={filterFieldStyle}>
         <label htmlFor="filter-status">
           Status
           <select
@@ -61,7 +67,7 @@ const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
           </select>
         </label>
       </div>
-      <div css={statusStyle}>
+      <div css={filterFieldStyle}>
         <label htmlFor="filter-category">
           Category
           <select
@@ -83,6 +89,23 @@ const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
           </select>
         </label>
       </div>
+      <div css={filterFieldStyle}>
+        <label htmlFor="filter-priority">
+          Priority
+          <select
+            id="filter-priority"
+            name="priority"
+            value={filter.priority || "All"}
+            onChange={handleFilter}
+            css={selectStyle}
+          >
+            <option>All</option>
+            <option value={PriorityEnum.LOW}>Low</option>
+            <option value={PriorityEnum.MEDIUM}>Medium</option>
+            <option value={PriorityEnum.HIGH}>High</option>
+          </select>
+        </label>
+      </div>
     </div>
   );
 };
@@ -90,12 +113,14 @@ const SearchFilter = ({ initialStatus, initialCategory, onFilter }) => {
 SearchFilter.propTypes = {
   initialStatus: PropTypes.string,
   initialCategory: PropTypes.string,
+  initialPriority: PropTypes.string,
   onFilter: PropTypes.func.isRequired,
 };
 
 SearchFilter.defaultProps = {
   initialStatus: null,
   initialCategory: null,
+  initialPriority: null,
 };
 
 export default SearchFilter;

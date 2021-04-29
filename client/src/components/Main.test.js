@@ -520,9 +520,39 @@ describe("Main", () => {
     expect(rows).toHaveLength(1);
   });
 
+  it("should render filtered tickets when filter by priority", async () => {
+    render(
+      <MemoryRouter initialEntries={["/tickets"]}>
+        <AuthProvider>
+          <ModalProvider>
+            <Route exact path={["/tickets", "/tickets/:id"]}>
+              <Main
+                tickets={ticketsToFilter}
+                onDeleteTicket={jest.fn()}
+                onUpdateTicket={jest.fn()}
+              />
+            </Route>
+          </ModalProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const search = screen.getByRole("search");
+
+    const priorityField = within(search).getByLabelText("Priority");
+    fireEvent.change(priorityField, { target: { value: PriorityEnum.MEDIUM } });
+
+    const table = screen.getByRole("table");
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body).getAllByRole("row");
+    expect(rows).toHaveLength(1);
+  });
+
   it("should render filtered tickets when URL query contains filter parameters", async () => {
     render(
-      <MemoryRouter initialEntries={["/tickets?status=OPEN&category=BUG"]}>
+      <MemoryRouter
+        initialEntries={["/tickets?status=OPEN&category=BUG&priority=MEDIUM"]}
+      >
         <AuthProvider>
           <ModalProvider>
             <Route exact path={["/tickets", "/tickets/:id"]}>
