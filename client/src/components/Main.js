@@ -1,14 +1,50 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useMemo } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import TicketTable from "./ticketTable";
 import TicketDisplay from "./TicketDisplay";
+import SearchFilter from "./SearchFilter";
 
 const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   const { id } = useParams();
   const history = useHistory();
+  const location = useLocation();
+  const [filteredTickets, setFilteredTickets] = useState(tickets);
+  const query = useMemo(() => new URLSearchParams(location.search), [location]);
+
+  useEffect(() => {
+    const status = query.get("status");
+    let newFilteredTickets = status
+      ? tickets.filter((ticket) => ticket.status === status)
+      : tickets;
+
+    const category = query.get("category");
+    newFilteredTickets = category
+      ? newFilteredTickets.filter((ticket) => ticket.category === category)
+      : newFilteredTickets;
+
+    const priority = query.get("priority");
+    newFilteredTickets = priority
+      ? newFilteredTickets.filter((ticket) => ticket.priority === priority)
+      : newFilteredTickets;
+
+    let search = query.get("search");
+    if (search) {
+      search = search.toLowerCase().trim();
+      newFilteredTickets = newFilteredTickets.filter(
+        (ticket) =>
+          ticket.id.toString().includes(search) ||
+          ticket.title.toLowerCase().includes(search) ||
+          ticket.description.toLowerCase().includes(search) ||
+          ticket.author.toLowerCase().includes(search) ||
+          ticket.agent?.toLowerCase().includes(search)
+      );
+    }
+
+    setFilteredTickets(newFilteredTickets);
+  }, [tickets, query]);
 
   const selectedTicket = useMemo(() => {
     return tickets.find((ticket) => ticket.id === Number(id));
@@ -30,12 +66,28 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
     text-align: center;
   `;
 
+  const handleFilter = ({ status, category, priority, search }) => {
+    let path = id ? `/tickets/${id}` : "/tickets";
+    query.delete("status");
+    query.delete("category");
+    query.delete("priority");
+    query.delete("search");
+
+    if (status) query.append("status", status);
+    if (category) query.append("category", category);
+    if (priority) query.append("priority", priority);
+    if (search) query.append("search", search);
+
+    path = path.concat(`?${query.toString()}`);
+    history.push(path);
+  };
+
   const handleClickRow = (ticket) => {
-    history.push(`/tickets/${ticket.id}`);
+    history.push(`/tickets/${ticket.id}?${query.toString()}`);
   };
 
   const handleClickClose = () => {
-    history.push(`/tickets`);
+    history.push(`/tickets?${query.toString()}`);
   };
 
   const handleUpdate = (field) => async (value) => {
@@ -55,8 +107,15 @@ const Main = ({ tickets, onDeleteTicket, onUpdateTicket, className }) => {
   return (
     <main css={mainStyle} className={className}>
       <div css={tableStyle}>
+        <SearchFilter
+          initialSearch={query.get("search")}
+          initialStatus={query.get("status")}
+          initialCategory={query.get("category")}
+          initialPriority={query.get("priority")}
+          onFilter={handleFilter}
+        />
         <TicketTable
-          tickets={tickets}
+          tickets={filteredTickets}
           selectedRow={Number(id)}
           onClickRow={handleClickRow}
         />
